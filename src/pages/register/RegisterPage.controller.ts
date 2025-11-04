@@ -1,3 +1,4 @@
+import axios from "axios";
 import { RegisterPageData, RegisterPageErrors } from "./RegisterPage.types";
 
 
@@ -12,23 +13,34 @@ export class RegisterPageController {
       throw errors;
   }
 
-  async submitData(data: RegisterPageData) {
+  async submitData(data: RegisterPageData): Promise<boolean> {
     const errors = this.validator.validateAll(data);
     const hasErrors = Object.values(errors).some(err => err != null);
 
     if (hasErrors)
       throw errors;
 
-    //submit data call
-    const valid: boolean = await this.__mockLogin(data);
+    const created: boolean = await this.register(data);
+    return created;
   }
 
-  private async __mockLogin(data: RegisterPageData): Promise<boolean> {
-    return true;
-    // setTimeout(() => { }, 1200);
-    // const userData = validUsers[data.email.trim().toLowerCase()];
-    // if (userData && data.password === '12345678') return true;
-    // return false;
+  private async register(data: RegisterPageData): Promise<boolean> {
+    // const response = await axios.get('http://127.0.0.1:3000/users');
+    try {
+      const response = await axios.post('http://127.0.0.1:3000/users', {
+        dni: data.documentNumber,
+        name: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        birthDate: data.birthDate + 'T00:00:00.000Z'
+      });
+      if (response.status != 201) return false;
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 }
 

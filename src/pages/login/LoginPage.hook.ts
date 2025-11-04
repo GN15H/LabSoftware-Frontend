@@ -39,12 +39,13 @@ export function useLoginPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      await controller.submitData(loginData); //este login deberia devolver al usuario
+      const loggedIn = await controller.submitData(loginData); //este login deberia devolver al usuario
       // setSnack({ open: true, severity: 'success', message: `¡Bienvenido $.name}!` });
       // if (userData.type === 'admin') router.push('/admin');
       // else if (userData.type === 'mecanico') router.push('/mecanico');
       // else router.push('/cliente');
-      router.push('/cliente');
+      if (loggedIn)
+        router.push('/cliente');
     } catch (e) {
       console.log(e);
       // setErrors(e);

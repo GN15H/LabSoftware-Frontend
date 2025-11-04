@@ -73,12 +73,14 @@ export function useRegisterPage() {
     }));
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
+      console.log(data);
       controller.checkData(data);
-
+      const created = await controller.submitData(data);
+      if (created) console.log("melo")
     } catch (e) {
       setErrors(e as RegisterPageErrors);
       showMessage('Por favor corrige los errores señalados en el formulario', 'error');

@@ -18,6 +18,7 @@ import {
   Avatar,
   SelectChangeEvent,
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Grid from '@mui/material/Grid'; // Grid v2 (sin item/xs/md) -> usar size={{ }}
 import CheckIcon from '@mui/icons-material/Check';
 import { useRegisterPage } from './RegisterPage.hook';
