@@ -5,12 +5,13 @@ import { RegisterPageData, RegisterPageErrors } from "./RegisterPage.types";
 export class RegisterPageController {
   private validator = new RegisterPageValidator();
 
-  checkData(data: RegisterPageData) {
+  checkData(data: RegisterPageData): RegisterPageErrors | null {
     const errors = this.validator.validateAll(data);
     const hasErrors = Object.values(errors).some(err => err != null);
 
     if (hasErrors)
-      throw errors;
+      return errors;
+    return null;
   }
 
   async submitData(data: RegisterPageData): Promise<boolean> {

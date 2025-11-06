@@ -18,7 +18,6 @@ import {
   Avatar,
   SelectChangeEvent,
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Grid from '@mui/material/Grid'; // Grid v2 (sin item/xs/md) -> usar size={{ }}
 import CheckIcon from '@mui/icons-material/Check';
 import { useRegisterPage } from './RegisterPage.hook';
@@ -239,6 +238,7 @@ export const RegisterPage = () => {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('birthDate', event.target.value)}
                     // InputLabelProps={{ shrink: true }}
                     fullWidth
+                    slotProps={{ inputLabel: { shrink: true } }}
                     variant="outlined"
                     sx={fieldSx()}
                   />
@@ -335,7 +335,7 @@ export const RegisterPage = () => {
                     </Typography>
                   }
                 />
-                {!!errors.termsAccepted && (
+                {!data.termsAccepted && (
                   <Typography variant="caption" color="error">{errors.termsAccepted}</Typography>
                 )}
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LoginPageData, LoginPageErrors } from "./LoginPage.types";
 import { useRouter } from "next/navigation";
 import { LoginPageController } from "./LoginPage.controller";
@@ -37,31 +37,21 @@ export function useLoginPage() {
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      const loggedIn = await controller.submitData(loginData); //este login deberia devolver al usuario
-      // setSnack({ open: true, severity: 'success', message: `¡Bienvenido $.name}!` });
-      // if (userData.type === 'admin') router.push('/admin');
-      // else if (userData.type === 'mecanico') router.push('/mecanico');
-      // else router.push('/cliente');
-      if (loggedIn)
-        router.push('/cliente');
-    } catch (e) {
-      console.log(e);
-      // setErrors(e);
-      setSnack({ open: true, severity: 'error', message: 'Por favor corrige los errores en el formulario' });
-    } finally {
-      setLoading(false);
+    const err = controller.checkData(loginData);
+    if (err != null) {
+      setErrors(err);
+      setSnack({ open: true, severity: 'error', message: controller.errorString(err) });
+      return;
     }
+    setLoading(true);
+    const loggedIn = await controller.submitData(loginData); //este login deberia devolver al usuario
+    setLoading(false);
+    if (!loggedIn) {
+      setSnack({ open: true, severity: 'error', message: 'Credenciales incorrectas' });
+      return;
+    }
+    router.push('/cliente');
   };
-
-  // useEffect(() => {
-  //   // Realtime validation behavior similar al original: blurs y input corrigen errores
-  //   if (errors.email && email) validateField('email', email);
-  //   if (errors.password && password) validateField('password', password);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [email, password]);
-  //
 
   return {
     loginData,

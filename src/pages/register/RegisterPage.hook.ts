@@ -47,15 +47,11 @@ export function useRegisterPage() {
   });
 
   useEffect(() => {
-    try {
-      console.log("mmm???");
-      controller.checkData(data);
-    } catch (e) {
-      console.log(e);
-      setErrors(e as RegisterPageErrors);
-    }
+    const e = controller.checkData(data);
+    if (e != null)
+      setErrors(e);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.firstName, data.lastName, data.documentType, data.documentNumber, data.email, data.phone, data.password, data.confirmPassword]);
+  }, [data.firstName, data.lastName, data.documentType, data.documentNumber, data.email, data.phone, data.password, data.confirmPassword, data.termsAccepted]);
 
   const goToLogin = () => router.push('/');
 
@@ -75,20 +71,23 @@ export function useRegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      setLoading(true);
-      console.log(data);
-      controller.checkData(data);
-      const created = await controller.submitData(data);
-      if (created) console.log("melo")
-    } catch (e) {
-      setErrors(e as RegisterPageErrors);
+    const errors: RegisterPageErrors | null = controller.checkData(data);
+    if (errors != null) {
+      setErrors(errors);
       showMessage('Por favor corrige los errores señalados en el formulario', 'error');
-    } finally {
-      setLoading(false);
+      return;
     }
+    setLoading(true);
+    console.log(data);
+    controller.checkData(data);
+    const created = await controller.submitData(data);
+    if (!created) {
+      showMessage('Hubo un error inesperado, intentalo mas tarde', 'error');
+      return;
+    }
+    setLoading(false);
     setStage(2);
-
+    goToLogin();
   }
 
   return {

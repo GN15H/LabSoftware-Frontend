@@ -5,6 +5,19 @@ import { LoginPageData, LoginPageErrors } from "./LoginPage.types";
 export class LoginPageController {
   private validator = new LoginPageValidator();
 
+  errorString(errors: LoginPageErrors): string {
+    return this.validator.errorAsString(errors);
+  }
+
+  checkData(data: LoginPageData): LoginPageErrors | null {
+    const errors = this.validator.validateAll(data);
+    const hasErrors = Object.values(errors).some(err => err != null);
+
+    if (hasErrors)
+      return errors;
+    return null;
+  }
+
   async submitData(data: LoginPageData): Promise<boolean> {
     const errors = this.validator.validateAll(data);
     const hasErrors = Object.values(errors).some(err => err != null);
@@ -37,13 +50,13 @@ class LoginPageValidator {
   readonly emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   private validateEmail(value: string): string | null {
-    if (!value) return 'El correo electrónico es obligatorio';
-    if (!this.emailRegex.test(value)) return 'El correo electrónico es obligatorio';
+    if (value.length == 0) return 'el correo electrónico es obligatorio';
+    if (!this.emailRegex.test(value)) return 'el correo electrónico no es válido';
     return null;
   }
 
   private validatePassword(value: string): string | null {
-    if (!value) return 'La contraseña es obligatoria';
+    if (value.length == 0) return 'la contraseña es obligatoria';
     return null;
   }
 
@@ -52,5 +65,15 @@ class LoginPageValidator {
       email: this.validateEmail(data.email),
       password: this.validatePassword(data.password)
     };
+  }
+
+  errorAsString(errors: LoginPageErrors): string {
+    let str = ''
+    if (errors.email != null) {
+      str += errors.email + ', ';
+    }
+    if (errors.password != null) str += errors.password;
+    if (str[str.length - 1] == ',') str = str.substring(0, str.length - 2);
+    return str;
   }
 }
