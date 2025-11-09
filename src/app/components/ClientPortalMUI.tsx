@@ -31,6 +31,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import CloseIcon from "@mui/icons-material/Close";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import { ItemList } from "@/pages/client-gateway/ItemList";
 
 const PALETA = {
   fondo: "#f8f9fa",
@@ -103,12 +104,12 @@ export default function ClientPortalMUI() {
   const router = useRouter();
   const logout = () => {
     try {
-        localStorage.removeItem('role');
-        localStorage.removeItem('token');
-        sessionStorage.clear();
-    } catch {}
+      localStorage.removeItem('role');
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+    } catch { }
     router.replace('/'); // vuelve al login
-    };
+  };
 
   const submitVehicle = (e: React.FormEvent) => {
     e.preventDefault();

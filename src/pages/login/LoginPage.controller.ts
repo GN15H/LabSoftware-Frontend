@@ -32,12 +32,24 @@ export class LoginPageController {
 
   private async login(data: LoginPageData): Promise<boolean> {
     try {
-      const response = await axios.post('http://127.0.0.1:3000/auth/login', {
+      console.log(process.env.NEXT_PUBLIC_BACKEND_URI + 'auth/login');
+      const login = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'auth/login', {
         email: data.email,
         password: data.password
       })
-      console.log(response);
-      return response.status != 201;
+      console.log(login);
+      if (login.status != 200) return false;
+      console.log("huh");
+      const token = login.data['access_token'];
+      console.log(login.data['access_token']);
+      const profileRequest = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URI + 'auth/profile',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+      localStorage.setItem('profile', JSON.stringify({ id: profileRequest.data['sub'], token: token }))
+      return true;
     } catch (e) {
       console.log(e);
       return false;
