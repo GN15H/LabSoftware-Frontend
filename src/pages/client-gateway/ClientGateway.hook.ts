@@ -16,6 +16,7 @@ export function useClientGateway() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
   // Dialog states
   const [vehicleOpen, setVehicleOpen] = useState(false);
@@ -38,7 +39,7 @@ export function useClientGateway() {
 
   const [apptData, setApptData] = useState<AppointmentData>({
     vehicle: null,
-    service: service,
+    service: null,
     date: '',
     hour: '10:00',
     description: ''
@@ -86,29 +87,69 @@ export function useClientGateway() {
     }
   };
 
-  const submitAppointment = (e: React.FormEvent) => {
+  const submitAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
+    const created = await controller.createAppointment(apptData);
+    if (created) {
+      setSnack({ open: true, sev: "success", message: "Cita agendada con éxito" });
+    }
+    else
+      setSnack({ open: true, sev: "error", message: "Error agendando la cita" });
     setApptOpen(false);
-    setSnack({ open: true, sev: "success", message: "Cita agendada con éxito" });
+    setTimeout(() => window.location.reload(), 2000);
   };
 
-  const executeCancelAppointment = () => {
+  const executeCancelAppointment = async (id: number) => {
+    const deleted = await controller.cancelAppointment(id);
+    if (deleted) {
+      const newAppointments = [...appointments];
+      const appt = newAppointments.findIndex(a => a.id == id);
+      newAppointments.splice(appt, 1);
+      setAppointments(newAppointments);
+      setSnack({ open: true, sev: "success", message: "Cita cancelada exitosamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo cancelar la cita" });
+    }
     setCancelOpen(false);
-    setSnack({ open: true, sev: "success", message: "Cita cancelada exitosamente" });
   };
 
-  const submitReasign = (e: React.FormEvent) => {
+  const submitApproveBudget = async (id: number) => {
+    const approved = await controller.approveBudget(id);
+    if (approved) {
+      setSnack({ open: true, sev: "success", message: "Presupuesto aprobado exitosamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo aprobar el presupuesto" });
+    }
+    setBudgetApprovedOpen(false);
+    setTimeout(() => window.location.reload(), 2000);
+  }
+
+  const submitReasign = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedAppointment == null) return;
+    const updated = await controller.reassignAppointment(reassignData, selectedAppointment.id);
+    if (updated) {
+      const newAppointments = [...appointments];
+      const appt = newAppointments.findIndex(a => a.id == selectedAppointment.id);
+      newAppointments[appt].date = new Date(reassignData.date + "T" + reassignData.hour + ":00.000Z")
+      setAppointments(newAppointments);
+      setSnack({ open: true, sev: "success", message: "Solicitud de reasignación enviada" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo reasignar la cita" });
+    }
     setReasignOpen(false);
-    setSnack({ open: true, sev: "success", message: "Solicitud de reasignación enviada" });
   };
 
-  const processPayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSnack({ open: true, sev: "info", message: "Procesando pago..." });
-    setTimeout(() => {
-      setPaymentOpen(false);
+  const processPayment = async (appointment: Appointment) => {
+    const created = await controller.createPayment(appointment, paymentData);
+    if (created) {
       setSnack({ open: true, sev: "success", message: "¡Pago procesado exitosamente!" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo procesar el pago" });
+    }
+    setPaymentOpen(false);
+    setTimeout(() => {
+      window.location.reload();
     }, 1800);
   };
 
@@ -137,8 +178,11 @@ export function useClientGateway() {
       setVehicles(data.vehicles);
       setAppointments(data.appointments);
       setServices(data.services);
+      console.log(data.appointments);
+      console.log("los servis", data.services);
     };
     console.log("tamo eperando");
+    console.log("y entonce eto ke e pue dedel huj", setSelectedAppointment);
     fetchData();
   }, []);
 
@@ -161,9 +205,11 @@ export function useClientGateway() {
     paymentData, setPaymentData,
     chatMsgs, setChatMsgs,
     chatInput, setChatInput,
+    selectedAppointment, setSelectedAppointment,
     logout,
     submitVehicle,
     submitAppointment,
+    submitApproveBudget,
     executeCancelAppointment,
     submitReasign,
     processPayment,

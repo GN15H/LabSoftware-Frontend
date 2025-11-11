@@ -1,3 +1,4 @@
+import { Appointment } from "@/domain/models/Appointment";
 import {
   Button,
   Dialog,
@@ -11,12 +12,13 @@ import {
 import { SetStateAction } from "react";
 
 interface CancelAppointmentProps {
+  appointment: Appointment | null;
   cancelOpen: boolean;
   setCancelOpen: React.Dispatch<SetStateAction<boolean>>;
-  executeCancelAppointment: () => void;
+  executeCancelAppointment: (id: number) => void;
 }
 
-export const CancelAppointment = ({ cancelOpen, setCancelOpen, executeCancelAppointment }: CancelAppointmentProps) => {
+export const CancelAppointment = ({ appointment, cancelOpen, setCancelOpen, executeCancelAppointment }: CancelAppointmentProps) => {
   return (
     <Dialog open={cancelOpen} onClose={() => setCancelOpen(false)} fullWidth maxWidth="xs">
       <DialogTitle>Confirmar Cancelación</DialogTitle>
@@ -33,7 +35,11 @@ export const CancelAppointment = ({ cancelOpen, setCancelOpen, executeCancelAppo
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setCancelOpen(false)} sx={{ bgcolor: "#eee7e1", color: "rgb(80,80,80)", "&:hover": { bgcolor: "#dad6d3" } }}>No cancelar</Button>
-        <Button onClick={executeCancelAppointment} sx={{ bgcolor: "#ca370b", color: "#fff", "&:hover": { bgcolor: "#ac3315" } }}>Sí, cancelar cita</Button>
+        <Button onClick={() => {
+          if (appointment != null)
+            executeCancelAppointment(appointment.id)
+        }}
+          sx={{ bgcolor: "#ca370b", color: "#fff", "&:hover": { bgcolor: "#ac3315" } }}>Sí, cancelar cita</Button>
       </DialogActions>
     </Dialog>
   );

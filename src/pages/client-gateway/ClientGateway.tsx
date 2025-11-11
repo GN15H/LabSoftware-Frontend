@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AppBar,
@@ -44,6 +44,8 @@ import { ReassignAppointment } from "./dialogs/ReassignAppointment";
 import { ApproveBudget } from "./dialogs/ApproveBudget";
 import { RejectBudget } from "./dialogs/RejectBudget";
 import { CancelAppointment } from "./dialogs/CancelAppointment";
+import { AppointmentsPayments } from "./components/AppointmentsPayment";
+import { PendingOrders } from "./components/PendingOrders";
 
 const PALETA = {
   fondo: "#f8f9fa",
@@ -84,9 +86,11 @@ export default function ClientGateway() {
     paymentData, setPaymentData,
     chatMsgs, setChatMsgs,
     chatInput, setChatInput,
+    selectedAppointment, setSelectedAppointment,
     logout,
     submitVehicle,
     submitAppointment,
+    submitApproveBudget,
     executeCancelAppointment,
     submitReasign,
     processPayment,
@@ -140,7 +144,7 @@ export default function ClientGateway() {
           <Grid size={{ xs: 12, md: 8 }}>
             {/* Gestión de Citas */}
 
-            <Appointments setApptOpen={setApptOpen} setReasignOpen={setReasignOpen} setCancelOpen={setCancelOpen} appointments={appointments} />
+            <Appointments setSelectedAppointment={setSelectedAppointment} setApptOpen={setApptOpen} setReasignOpen={setReasignOpen} setCancelOpen={setCancelOpen} appointments={appointments} />
 
             {/* Mis Vehículos */}
 
@@ -148,7 +152,7 @@ export default function ClientGateway() {
 
             {/* Historial de Servicios */}
 
-            <AppointmentsStory appointments={appointmentsStory} />
+            <AppointmentsStory appointments={appointments} />
 
           </Grid>
 
@@ -157,47 +161,11 @@ export default function ClientGateway() {
           <Grid size={{ xs: 12, md: 4 }}>
             <Stack spacing={3}>
               {/* Estado del Servicio + Pago */}
-              <Paper sx={{ p: 3, borderRadius: 3, boxShadow: PALETA.cardShadow, background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)", border: `2px solid ${PALETA.azul}` }}>
-                <Typography sx={{ fontSize: 20, fontWeight: 800, color: "#1976d2", textAlign: "center", mb: 1.5 }}>🔧 Estado del Servicio</Typography>
-                <Box sx={{ borderLeft: "5px solid #4caf50", bgcolor: "rgba(255,255,255,0.9)", p: 2, borderRadius: 1 }}>
-                  <Typography sx={{ fontWeight: 800, color: PALETA.texto, mb: 0.5 }}>Honda Civic - XYZ-789</Typography>
-                  <Typography sx={{ color: PALETA.textoSuave, fontSize: 14, lineHeight: 1.6, mb: 1 }}>
-                    <b>Estado:</b> ✅ Listo para entrega<br />
-                    <b>Trabajo completado:</b> Sí<br />
-                    <b>Mecánico:</b> Carlos Rodríguez<br />
-                    <b>Finalizado:</b> 2:30 PM
-                  </Typography>
-                  {/* <StatusBadge type="ready" /> */}
-
-                  {/* Pago */}
-                  <Box sx={{ mt: 2, p: 2, borderRadius: 2, textAlign: "center", background: "linear-gradient(135deg, #fff3e0, #ffcc80)", border: "2px solid #ff9800" }}>
-                    <Typography sx={{ color: "#e65100", fontWeight: 800, mb: 1 }}>💳 Pago Pendiente</Typography>
-                    <Typography sx={{ fontSize: 26, fontWeight: 800, color: PALETA.texto, mb: 1 }}>$450,000</Typography>
-                    <Button startIcon={<CreditCardIcon />} onClick={() => setPaymentOpen(true)} fullWidth variant="contained" sx={{ background: "linear-gradient(135deg, #4caf50, #388e3c)", "&:hover": { background: "linear-gradient(135deg, #66bb6a, #4caf50)" } }}>
-                      Pagar Ahora
-                    </Button>
-                    <Typography sx={{ fontSize: 12, color: "#5d4037", mt: 1 }}>
-                      ✓ Pago seguro SSL • ✓ Tarjetas crédito/débito • ✓ Factura digital automática
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
+              <AppointmentsPayments setSelectedAppointment={setSelectedAppointment} appointments={appointments} setPaymentOpen={setPaymentOpen} />
 
               {/* Presupuestos Pendientes */}
-              <Paper sx={{ p: 2, borderRadius: 3, boxShadow: PALETA.cardShadow }}>
-                <Typography sx={{ fontSize: 18, fontWeight: 800, color: PALETA.texto, mb: 1 }}>Presupuestos Pendientes</Typography>
+              <PendingOrders setSelectedAppointment={setSelectedAppointment} appointments={appointments} showApproveBudget={showApproveBudget} showRejectBudget={showRejectBudget} />
 
-                {[{ titulo: "Revisión Honda Civic", monto: "$450,000", urgente: true }, { titulo: "Cambio de aceite Toyota", monto: "$85,000", urgente: false }].map((b, i) => (
-                  <Box key={i} sx={{ p: 2, borderRadius: 2, mb: 2, bgcolor: b.urgente ? "#f8d7da" : "#fff3cd", border: `1px solid ${b.urgente ? "#f5c6cb" : "#ffeaa7"}` }}>
-                    <Typography sx={{ fontWeight: 800, color: PALETA.texto }}>{b.titulo}</Typography>
-                    <Typography sx={{ color: PALETA.textoSuave, mt: 0.5 }}>Monto: <b style={{ color: "#e17055" }}>{b.monto}</b></Typography>
-                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                      <Button onClick={showApproveBudget} sx={{ bgcolor: "#21aa43", color: "#fff", "&:hover": { bgcolor: "#138d46" } }}>Aprobar</Button>
-                      <Button onClick={showRejectBudget} sx={{ bgcolor: "#ca370b", color: "#fff", "&:hover": { bgcolor: "#ac3315" } }}>Rechazar</Button>
-                    </Stack>
-                  </Box>
-                ))}
-              </Paper>
             </Stack>
           </Grid>
         </Grid>
@@ -220,15 +188,15 @@ export default function ClientGateway() {
       <ReassignAppointment reasignOpen={reasignOpen} setReasignOpen={setReasignOpen} reasignForm={reassignData} setReasignForm={setReassignData} submitReasign={submitReasign} />
 
       {/* Dialog: Confirmar Cancelación */}
-      <CancelAppointment cancelOpen={cancelOpen} setCancelOpen={setCancelOpen} executeCancelAppointment={executeCancelAppointment} />
+      <CancelAppointment appointment={selectedAppointment} cancelOpen={cancelOpen} setCancelOpen={setCancelOpen} executeCancelAppointment={executeCancelAppointment} />
 
       {/* Dialog: Pasarela de Pago */}
-      <PaymentGateway paymentOpen={paymentOpen} setPaymentOpen={setPaymentOpen} processPayment={processPayment} paymentForm={paymentData} setPaymentForm={setPaymentData} />
+      <PaymentGateway selectedAppointment={selectedAppointment} paymentOpen={paymentOpen} setPaymentOpen={setPaymentOpen} processPayment={processPayment} paymentForm={paymentData} setPaymentForm={setPaymentData} />
 
       {/* Dialog: Presupuesto Aprobado */}
-      <ApproveBudget budgetApprovedOpen={budgetApprovedOpen} setBudgetApprovedOpen={setBudgetApprovedOpen} />
+      <ApproveBudget submitApproveBudget={submitApproveBudget} selectedAppointment={selectedAppointment} budgetApprovedOpen={budgetApprovedOpen} setBudgetApprovedOpen={setBudgetApprovedOpen} />
       {/* Dialog: Presupuesto Rechazado */}
-      <RejectBudget budgetRejectedOpen={budgetRejectedOpen} setBudgetRejectedOpen={setBudgetRejectedOpen} />
+      <RejectBudget selectedAppointment={selectedAppointment} executeCancelAppointment={executeCancelAppointment} budgetRejectedOpen={budgetRejectedOpen} setBudgetRejectedOpen={setBudgetRejectedOpen} />
 
       {/* Snackbar */}
       <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>

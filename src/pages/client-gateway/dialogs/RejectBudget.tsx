@@ -1,3 +1,4 @@
+import { Appointment } from "@/domain/models/Appointment";
 import {
   Button,
   Dialog,
@@ -11,10 +12,12 @@ import { SetStateAction } from "react";
 
 interface RejectBudgetProps {
   budgetRejectedOpen: boolean;
+  selectedAppointment: Appointment | null;
   setBudgetRejectedOpen: React.Dispatch<SetStateAction<boolean>>;
+  executeCancelAppointment: (id: number) => void;
 }
 
-export const RejectBudget = ({ budgetRejectedOpen, setBudgetRejectedOpen }: RejectBudgetProps) => {
+export const RejectBudget = ({ budgetRejectedOpen, setBudgetRejectedOpen, selectedAppointment, executeCancelAppointment }: RejectBudgetProps) => {
   return (
     <Dialog open={budgetRejectedOpen} onClose={() => setBudgetRejectedOpen(false)} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ color: "#e74c3c" }}>Presupuesto Rechazado</DialogTitle>
@@ -27,7 +30,12 @@ export const RejectBudget = ({ budgetRejectedOpen, setBudgetRejectedOpen }: Reje
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setBudgetRejectedOpen(false)} sx={{ bgcolor: "#ca370b", color: "#fff", "&:hover": { bgcolor: "#ac3315" } }}>Entendido</Button>
+        <Button onClick={() => {
+          if (selectedAppointment == null) return;
+          executeCancelAppointment(selectedAppointment.id);
+          setBudgetRejectedOpen(false)
+        }
+        } sx={{ bgcolor: "#ca370b", color: "#fff", "&:hover": { bgcolor: "#ac3315" } }}>Entendido</Button>
       </DialogActions>
     </Dialog>
   );

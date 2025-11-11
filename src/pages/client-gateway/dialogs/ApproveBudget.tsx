@@ -9,13 +9,16 @@ import {
 } from "@mui/material";
 import { PALETA } from "../ClientPalette";
 import { SetStateAction } from "react";
+import { Appointment } from "@/domain/models/Appointment";
 
 interface ApproveBudgetProps {
   budgetApprovedOpen: boolean;
+  selectedAppointment: Appointment | null;
   setBudgetApprovedOpen: React.Dispatch<SetStateAction<boolean>>;
+  submitApproveBudget: (id: number) => void;
 }
 
-export const ApproveBudget = ({ budgetApprovedOpen, setBudgetApprovedOpen }: ApproveBudgetProps) => {
+export const ApproveBudget = ({ selectedAppointment, submitApproveBudget, budgetApprovedOpen, setBudgetApprovedOpen }: ApproveBudgetProps) => {
   return (
     <Dialog open={budgetApprovedOpen} onClose={() => setBudgetApprovedOpen(false)} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ color: PALETA.verde }}>Presupuesto Aprobado</DialogTitle>
@@ -28,7 +31,10 @@ export const ApproveBudget = ({ budgetApprovedOpen, setBudgetApprovedOpen }: App
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setBudgetApprovedOpen(false)} sx={{ bgcolor: "#21aa43", color: "#fff", "&:hover": { bgcolor: "#138d46" } }}>Entendido</Button>
+        <Button onClick={() => {
+          if (selectedAppointment == null) return;
+          submitApproveBudget(selectedAppointment.id)
+        }} sx={{ bgcolor: "#21aa43", color: "#fff", "&:hover": { bgcolor: "#138d46" } }}>Entendido</Button>
       </DialogActions>
     </Dialog>
   );

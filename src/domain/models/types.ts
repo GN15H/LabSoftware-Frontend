@@ -5,7 +5,7 @@ export type SpecialtyType = 'specialty';
 
 export type SupplyType = 'supply';
 
-export type AppointmentStateType = "pending" | "ongoing" | "completed" | "cancelled";
+export type AppointmentStateType = "pending" | "ongoing" | "completed" | "cancelled" | "paid" | "confirmed";
 
 export type VehicleType = 'bike' | 'car' | 'bus';
 
@@ -39,14 +39,18 @@ export function userTypeFromId(id: number): UserType {
 }
 export function appointmentStateFromId(id: number): AppointmentStateType {
   switch (id) {
-    case 1:
-      return 'pending';
     case 2:
-      return 'ongoing';
+      return 'pending';
     case 3:
-      return 'completed';
+      return 'ongoing';
     case 4:
+      return 'completed';
+    case 5:
       return 'cancelled';
+    case 6:
+      return 'paid';
+    case 7:
+      return 'confirmed';
     default:
       return 'pending';
   }

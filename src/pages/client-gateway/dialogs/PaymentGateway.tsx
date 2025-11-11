@@ -17,16 +17,28 @@ import { PALETA } from "../ClientPalette";
 import { fieldSx } from "../ClientGateway";
 import { SetStateAction } from "react";
 import { PaymentData } from "../ClientGateway.types";
+import { Appointment } from "@/domain/models/Appointment";
 
 interface PaymentGatewayProps {
+  selectedAppointment: Appointment | null;
   paymentOpen: boolean;
   setPaymentOpen: React.Dispatch<SetStateAction<boolean>>;
-  processPayment: (e: React.FormEvent) => void;
+  processPayment: (appointment: Appointment) => void;
   paymentForm: PaymentData;
   setPaymentForm: React.Dispatch<SetStateAction<PaymentData>>;
 }
 
-export const PaymentGateway = ({ paymentOpen, setPaymentOpen, processPayment, paymentForm, setPaymentForm }: PaymentGatewayProps) => {
+export const PaymentGateway = ({ selectedAppointment, paymentOpen, setPaymentOpen, processPayment, paymentForm, setPaymentForm }: PaymentGatewayProps) => {
+
+  const total = (appt: Appointment | null): bigint => {
+    if (appt == null) return BigInt(0);
+    let value: bigint = BigInt(0);
+    for (const s of appt.services) {
+      value = value + s.price;
+    }
+    return value;
+  }
+
   return (
     <Dialog open={paymentOpen} onClose={() => setPaymentOpen(false)} fullWidth maxWidth="sm">
       <DialogTitle>💳 Pasarela de Pago Seguro</DialogTitle>
@@ -37,22 +49,22 @@ export const PaymentGateway = ({ paymentOpen, setPaymentOpen, processPayment, pa
             <b>Servicio:</b> Revisión Honda Civic<br />
             <b>Vehículo:</b> Honda Civic (XYZ-789)<br />
             <b>Fecha:</b> Miércoles, 25 de Septiembre<br />
-            <b>Total a pagar:</b> <span style={{ color: "#27ae60", fontWeight: 800 }}>$450,000</span>
+            <b>Total a pagar:</b> <span style={{ color: "#27ae60", fontWeight: 800 }}>${total(selectedAppointment)}</span>
           </Typography>
         </Paper>
 
-        <Grid container spacing={2} component="form" onSubmit={processPayment}>
+        <Grid container spacing={2} component="form" >
           <Grid size={{ xs: 12 }}>
-            <TextField required fullWidth label="Número de Tarjeta" placeholder="1234 5678 9012 3456" inputProps={{ maxLength: 19 }} sx={fieldSx()} />
+            <TextField required fullWidth label="Número de Tarjeta" placeholder="1234 5678 9012 3456" inputProps={{ maxLength: 19 }} sx={fieldSx()} onChange={(e) => setPaymentForm({ ...paymentForm, number: e.target.value })} />
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <TextField required fullWidth label="Fecha de Expiración" placeholder="MM/AA" inputProps={{ maxLength: 5 }} sx={fieldSx()} />
+            <TextField required fullWidth label="Fecha de Expiración" placeholder="MM/AA" inputProps={{ maxLength: 5 }} sx={fieldSx()} onChange={(e) => setPaymentForm({ ...paymentForm, exp: e.target.value })} />
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <TextField required fullWidth label="CVV" placeholder="123" inputProps={{ maxLength: 3 }} sx={fieldSx()} />
+            <TextField required fullWidth label="CVV" placeholder="123" inputProps={{ maxLength: 3 }} sx={fieldSx()} onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value })} />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <TextField required fullWidth label="Nombre del Titular" placeholder="Nombre como aparece en la tarjeta" sx={fieldSx()} />
+            <TextField required fullWidth label="Nombre del Titular" placeholder="Nombre como aparece en la tarjeta" sx={fieldSx()} onChange={(e) => setPaymentForm({ ...paymentForm, holder: e.target.value })} />
           </Grid>
           <Grid size={{ xs: 12 }}>
             <FormControl fullWidth required sx={fieldSx()}>
@@ -70,7 +82,10 @@ export const PaymentGateway = ({ paymentOpen, setPaymentOpen, processPayment, pa
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setPaymentOpen(false)} sx={{ bgcolor: "#eee7e1", color: "rgb(80,80,80)", "&:hover": { bgcolor: "#dad6d3" } }}>Cancelar</Button>
-        <Button onClick={processPayment as any} sx={{ bgcolor: "#21aa43", color: "#fff", "&:hover": { bgcolor: "#138d46" } }}>Pagar $450,000</Button>
+        <Button onClick={() => {
+          if (selectedAppointment == null) return;
+          processPayment(selectedAppointment);
+        }} sx={{ bgcolor: "#21aa43", color: "#fff", "&:hover": { bgcolor: "#138d46" } }}>PAGAR</Button>
       </DialogActions>
     </Dialog>
   )
