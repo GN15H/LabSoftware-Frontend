@@ -69,8 +69,7 @@ export function useClientGateway() {
   const router = useRouter();
   const logout = () => {
     try {
-      localStorage.removeItem('role');
-      localStorage.removeItem('token');
+      localStorage.removeItem('profile');
       sessionStorage.clear();
     } catch { }
     router.replace('/'); // vuelve al login
@@ -173,6 +172,17 @@ export function useClientGateway() {
   };
 
   useEffect(() => {
+    const profileUnserialized = localStorage.getItem('profile')
+    if (profileUnserialized == null) {
+      router.replace('/');
+      return;
+    }
+    const profile = JSON.parse(profileUnserialized);
+    if (profile['userType'] == 'admin')
+      router.replace('/admin');
+    else if (profile['userType'] == 'mechanic')
+      router.replace('/mecanico');
+
     const fetchData = async () => {
       const data = await controller.fetchData();
       setVehicles(data.vehicles);

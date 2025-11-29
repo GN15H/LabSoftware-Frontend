@@ -50,7 +50,14 @@ export function useLoginPage() {
       setSnack({ open: true, severity: 'error', message: 'Credenciales incorrectas' });
       return;
     }
-    router.push('/cliente');
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    console.log('ejem el perfil si se puede saber?', profile);
+    if (profile['userType'] == 'admin')
+      router.push('/admin');
+    else if (profile['userType'] == 'mechanic')
+      router.push('/mecanico');
+    else if (profile['userType'] == 'user')
+      router.push('/cliente');
   };
 
   return {

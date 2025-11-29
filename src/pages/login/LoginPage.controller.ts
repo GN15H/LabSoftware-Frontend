@@ -48,7 +48,7 @@ export class LoginPageController {
             Authorization: `Bearer ${token}`
           }
         })
-      localStorage.setItem('profile', JSON.stringify({ id: profileRequest.data['sub'], token: token }))
+      localStorage.setItem('profile', JSON.stringify({ id: profileRequest.data['sub'], userType: profileRequest.data['user_type'], token: token }))
       return true;
     } catch (e) {
       console.log(e);
