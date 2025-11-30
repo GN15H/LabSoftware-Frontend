@@ -92,6 +92,34 @@ export function useAdminGateway() {
     }
   }
 
+  const updateAppointment = async (id: number, date: string, hour: string) => {
+    const updated: boolean = await controller.reassignAppointment(id, date, hour);
+    if (updated) {
+      setAppointments(prev => {
+        const toBeUpdatedAppointment = prev.find(s => s.id == id);
+        if (toBeUpdatedAppointment == undefined) return prev;
+        let newArr = [...prev];
+        const toBeUpdatedAppointmentIndex = newArr.indexOf(toBeUpdatedAppointment);
+        newArr[toBeUpdatedAppointmentIndex].date = new Date(date + "T" + hour + ":00.000Z")
+        return newArr;
+      });
+    }
+  }
+
+  const cancelAppointment = async (id: number) => {
+    const cancelled: boolean = await controller.cancelAppointment(id);
+    if (cancelled) {
+      setAppointments(prev => {
+        const toBeDeletedAppointment = prev.find(s => s.id == id);
+        if (toBeDeletedAppointment == undefined) return prev;
+        let newArr = [...prev];
+        const toBeDeletedAppointmentIndex = newArr.indexOf(toBeDeletedAppointment);
+        newArr.splice(toBeDeletedAppointmentIndex, 1);
+        return newArr;
+      });
+    }
+  }
+
   const createUser = async (data: UserData) => {
     const createdUser: User | null = await controller.createUser(data);
     if (createdUser != null) {
@@ -132,7 +160,7 @@ export function useAdminGateway() {
     createService, updateService,
     createSupply, updateSupply,
     createSupplier, updateSupplier,
-    createAppointment,
+    createAppointment, updateAppointment, cancelAppointment,
     createUser
   }
 }

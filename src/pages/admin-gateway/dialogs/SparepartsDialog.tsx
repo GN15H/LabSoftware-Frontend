@@ -98,16 +98,6 @@ export function SparepartsDialog({
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <GhostBtn onClick={(e) => {
-                      e.stopPropagation();
-                      // adjust(p.id, +1); 
-                      console.log("+1")
-                    }}>+1</GhostBtn>
-                    <GhostBtn onClick={(e) => {
-                      e.stopPropagation();
-                      console.log("-1")
-                      // adjust(p.id, -1);
-                    }}>-1</GhostBtn>
                     <IconButton aria-label="Eliminar" color="error" onClick={(e) => {
                       e.stopPropagation();
                       console.log("remover")

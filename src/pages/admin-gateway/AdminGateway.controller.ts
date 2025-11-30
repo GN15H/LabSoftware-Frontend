@@ -236,6 +236,36 @@ export class AdminGatewayController {
     }
   }
 
+  async reassignAppointment(appointmentId: number, date: string, hour: string): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.patch(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointments/' + appointmentId.toString(), {
+      appointment_date: date + "T" + hour + ":00.000Z",
+    }, {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+
+    if (request.status != 200) return false;
+
+    if (request.data['response'] != undefined) {
+      if (request.data['response'] == 'No hay bahias' ||
+        request.data['response'] == 'No hay mecanicos')
+        return false
+    }
+    return true;
+  }
+
+  async cancelAppointment(id: number): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.delete(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointments/' + id.toString(), {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    return request.status == 200;
+  }
+
   async createUser(data: UserData): Promise<User | null> {
     const request = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'users', {
       dni: data.dni,

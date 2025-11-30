@@ -12,20 +12,22 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import { DangerBtn, GhostBtn, ListItemCard } from "../AdminGateway.components";
+import { Appointment } from "@/domain/models/Appointment";
 
+interface CancelAppointmentDialogProps {
+  open: boolean;
+  onClose: () => void;
+  appointments: Appointment[];
+  cancelAppointment: (id: number) => void;
+}
 export function CancelAppointmentDialog({
   open,
   onClose,
   appointments,
-  setAppointments,
-}: {
-  open: boolean;
-  onClose: () => void;
-  appointments: Array<{ id: string; client: string; vehicle: string; service: string; date: string; time: string; mechanic: string }>;
-  setAppointments: React.Dispatch<React.SetStateAction<Array<{ id: string; client: string; vehicle: string; service: string; date: string; time: string; mechanic: string }>>>;
-}) {
+  cancelAppointment
+}: CancelAppointmentDialogProps) {
   const [query, setQuery] = React.useState("");
-  const [selected, setSelected] = React.useState<string | null>(null);
+  const [selected, setSelected] = React.useState<Appointment | null>(null);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -40,25 +42,24 @@ export function CancelAppointmentDialog({
     const q = query.toLowerCase().trim();
     if (!q) return true;
     return (
-      a.id.toLowerCase().includes(q) ||
-      a.client.toLowerCase().includes(q) ||
-      a.vehicle.toLowerCase().includes(q) ||
-      a.service.toLowerCase().includes(q) ||
-      a.mechanic.toLowerCase().includes(q)
+      a.vehicle.plateNumber.toLowerCase().includes(q) ||
+      a.mechanic.name.toLowerCase().includes(q) ||
+      a.mechanic.lastName.toLowerCase().includes(q)
     );
   });
 
-  const selectedAppt = appointments.find(a => a.id === selected) || null;
+  // const selectedAppt = appointments.find(a => a.id === selected) || null;
 
   const requestCancel = () => {
-    if (!selectedAppt) return;
+    if (!selected) return;
     setConfirmOpen(true);
   };
 
   const executeCancel = () => {
-    if (!selectedAppt) return;
-    setAppointments(prev => prev.filter(a => a.id !== selectedAppt.id));
+    if (!selected) return;
+    // setAppointments(prev => prev.filter(a => a.id !== selectedAppt.id));
     setConfirmOpen(false);
+    cancelAppointment(selected.id);
     onClose();
   };
 
@@ -82,19 +83,15 @@ export function CancelAppointmentDialog({
           />
 
           <Box sx={{ maxHeight: 320, overflowY: 'auto' }}>
-            {filtered.map(ap => (
+            {filtered.filter(ap => ap.appointmentState == 'pending').map(ap => (
               <ListItemCard
                 key={ap.id}
-                onClick={() => setSelected(ap.id)}
-                sx={{
-                  border: ap.id === selected ? '2px solid #e57373' : '1px solid #ecf0f1',
-                  backgroundColor: ap.id === selected ? '#fdecea' : '#f8f9fa'
-                }}
+                onClick={() => setSelected(ap)}
               >
                 <Box>
-                  <Typography sx={{ fontWeight: 'bold', color: '#2c3e50' }}>{ap.id} • {ap.client}</Typography>
+                  <Typography sx={{ fontWeight: 'bold', color: '#2c3e50' }}>{ap.id}</Typography>
                   <Typography sx={{ fontSize: '.85rem', color: '#7f8c8d' }}>
-                    {ap.service} • {ap.vehicle} • {ap.date} {ap.time} • {ap.mechanic}
+                    {ap.vehicle.brand} • {ap.date.toLocaleDateString()} {ap.mechanic.name} {ap.appointmentState}
                   </Typography>
                 </Box>
                 <Chip label="Elegir" color="error" />
@@ -115,8 +112,14 @@ export function CancelAppointmentDialog({
         <DialogContent dividers>
           <Box sx={{ backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 2, p: 2, textAlign: 'center' }}>
             <Typography>¿Cancelar la cita seleccionada?</Typography>
-            <Typography fontWeight={700} sx={{ my: 1 }}>{selectedAppt?.id || '-'}</Typography>
-            <Typography fontSize=".9rem">{selectedAppt ? `${selectedAppt.client} • ${selectedAppt.service} • ${selectedAppt.date} ${selectedAppt.time}` : ''}</Typography>
+            <Typography fontWeight={700} sx={{ my: 1 }}>{selected?.id || '-'}</Typography>
+            <Typography fontSize=".9rem">{selected ? `${(() => {
+              let services: string = '';
+              selected.services.forEach(s => {
+                services += `${s.name} `;
+              })
+              return services
+            })()} • ${selected.date.toLocaleString()}` : ''}</Typography>
           </Box>
         </DialogContent>
         <DialogActions>

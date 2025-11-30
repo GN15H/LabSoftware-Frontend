@@ -25,14 +25,14 @@ interface ReassignAppointmentDialog {
   open: boolean;
   onClose: () => void;
   appointments: Appointment[];
-  setAppointments: React.Dispatch<React.SetStateAction<Array<{ id: string; client: string; vehicle: string; service: string; date: string; time: string; mechanic: string }>>>;
+  rescheduleAppointment: (id: number, date: string, hour: string) => void;
 }
 
 export function ReassignAppointmentDialog({
   open,
   onClose,
-  setAppointments,
-  appointments
+  appointments,
+  rescheduleAppointment
 }: ReassignAppointmentDialog) {
   const [query, setQuery] = React.useState("");
   const [selected, setSelected] = React.useState<Appointment | null>(null);
@@ -94,12 +94,10 @@ export function ReassignAppointmentDialog({
                   key={ap.id}
                   onClick={() => {
                     setSelected(ap)
+                    setNewDate(ap.date.toISOString().split('T')[0])
+                    setNewTime(ap.date.toISOString().split('T')[1].substring(0, 5))
                     console.log("selected")
                   }}
-                // sx={{
-                //   border: ap.id === selected ? '2px solid #3498db' : '1px solid #ecf0f1',
-                //   backgroundColor: ap.id === selected ? '#e8f4fd' : '#f8f9fa'
-                // }}
                 >
                   <Box>
                     <Typography sx={{ fontWeight: 'bold', color: '#2c3e50' }}>{ap.id}</Typography>
@@ -138,15 +136,6 @@ export function ReassignAppointmentDialog({
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel>Mecánico</InputLabel>
-                  <Select
-                    disabled={selected != null && selected.appointmentState != 'pending'}
-                    label="Mecánico" value={newMechanic} onChange={(e) => setNewMechanic(e.target.value as string)}>
-                    {mechanics.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
-                  </Select>
-                </FormControl>
-
                 {selected && (
                   <Box sx={{ mt: 1, p: 2, border: '1px solid #a5d6a7', borderRadius: 2, background: 'linear-gradient(135deg, #e8f5e9, #e3f2fd)' }}>
                     <Typography sx={{ color: '#2e7d32', fontWeight: 'bold' }}>Resumen</Typography>
@@ -177,7 +166,10 @@ export function ReassignAppointmentDialog({
       <DialogActions>
         <GhostBtn onClick={onClose}>Cancelar</GhostBtn>
         <PrimaryBtn
-          onClick={() => console.log("save")}
+          onClick={() => {
+            if (selected == null) return;
+            rescheduleAppointment(selected.id, newDate, newTime)
+          }}
           disabled={!selected}
           startIcon={<AssignmentIcon />}
         >

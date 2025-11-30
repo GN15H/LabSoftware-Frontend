@@ -103,14 +103,14 @@ export default function AdminGateway() {
     services, setServices,
     supplies, setSupplies,
     suppliers, setSuppliers,
-    users, setUsers,
-    vehicles, setVehicles,
+    users, //setUsers,
+    vehicles, //setVehicles,
     createService, updateService,
     createSupply, updateSupply,
     createSupplier, updateSupplier,
-    createAppointment,
+    createAppointment, updateAppointment, cancelAppointment,
     createUser,
-    appointments, setAppointments
+    appointments, //setAppointments
   } = useAdminGateway();
 
   const downSm = useMediaQuery('(max-width:768px)');
@@ -280,8 +280,8 @@ export default function AdminGateway() {
         <SearchUserDialog users={users} open={openSearchUser} onClose={() => setOpenSearchUser(false)} />
         <VehiclesDialog vehicles={vehicles} open={openVehicles} onClose={() => setOpenVehicles(false)} />
         <ScheduleAppointmentDialog users={users} services={services} vehicles={vehicles} createAppointment={createAppointment} open={openSchedule} onClose={() => setOpenSchedule(false)} />
-        <ReassignAppointmentDialog open={openReassign} onClose={() => setOpenReassign(false)} appointments={appointments} setAppointments={setAppointments} />
-        <CancelAppointmentDialog open={openCancel} onClose={() => setOpenCancel(false)} appointments={appointments} setAppointments={setAppointments} />
+        <ReassignAppointmentDialog rescheduleAppointment={updateAppointment} open={openReassign} onClose={() => setOpenReassign(false)} appointments={appointments} />
+        <CancelAppointmentDialog open={openCancel} onClose={() => setOpenCancel(false)} appointments={appointments} cancelAppointment={cancelAppointment} />
         <DeleteUserDialog open={openDeleteUser} onClose={() => setOpenDeleteUser(false)} />
         <CreateServiceDialog open={openCreateService} onClose={() => setOpenCreateService(false)} onCreate={createService} />
         <ServicesCatalogDialog updateService={updateService} open={openCatalog} onClose={() => setOpenCatalog(false)} services={services} setServices={setServices} />

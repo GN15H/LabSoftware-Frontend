@@ -114,7 +114,6 @@ export class ClientGatewayController {
         Authorization: `Bearer ${profile['token']}`
       }
     })
-
     return request.status == 200;
   }
 
