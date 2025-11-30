@@ -5,7 +5,7 @@ import { ISupplyMap, Supply } from "@/domain/models/Supply";
 import { IUserMap, User } from "@/domain/models/User";
 import { IVehicleMap, Vehicle } from "@/domain/models/Vehicle";
 import axios from "axios";
-import { SupplierData, SupplyData, UserData } from "./AdminGateway.types";
+import { AppointmentData, SupplierData, SupplyData, UserData } from "./AdminGateway.types";
 
 
 export class AdminGatewayController {
@@ -213,6 +213,27 @@ export class AdminGatewayController {
     if (request.status != 200) return null;
     const newSupplier: Supplier = Supplier.fromMap(request.data);
     return newSupplier;
+  }
+
+  async createAppointment(value: AppointmentData): Promise<Appointment | null> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointments', {
+      appointment_date: value.date + "T" + value.hour + ":00.000Z",
+      vehicle_id: value.vehicle,
+      service: value.service
+    }, {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    if (request.status == 201) {
+      if (request.data['response'] != undefined && (request.data['response'] == 'No hay bahias' ||
+        request.data['response'] == 'No hay mecanicos'))
+        return null;
+      else return Appointment.fromMap(request.data);
+    } else {
+      return null;
+    }
   }
 
   async createUser(data: UserData): Promise<User | null> {

@@ -23,3 +23,11 @@ export type UserData = {
   confirmPassword: string;
   birthDate: string;
 }
+
+export type AppointmentData = {
+  vehicle: number | null,
+  service: number | null,
+  date: string,
+  hour: string,
+  description: string
+}

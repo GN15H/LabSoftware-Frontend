@@ -108,8 +108,9 @@ export default function AdminGateway() {
     createService, updateService,
     createSupply, updateSupply,
     createSupplier, updateSupplier,
-    createUser
-    // appointments, setAppointments
+    createAppointment,
+    createUser,
+    appointments, setAppointments
   } = useAdminGateway();
 
   const downSm = useMediaQuery('(max-width:768px)');
@@ -129,12 +130,13 @@ export default function AdminGateway() {
   const [openProviders, setOpenProviders] = React.useState(false);
   const [openSpareparts, setOpenSpareparts] = React.useState(false);
   const [openReports, setOpenReports] = React.useState(false);
+
   // Estado compartido de citas (mock para demo)
-  const [appointments, setAppointments] = React.useState([
-    { id: "CITA-001", client: "Juan Pérez", vehicle: "Toyota Corolla 2020 (ABC-123)", service: "Cambio de aceite", date: "2025-10-27", time: "09:00", mechanic: "Luis González" },
-    { id: "CITA-002", client: "María García", vehicle: "Honda Civic 2019 (XYZ-789)", service: "Servicio de frenos", date: "2025-10-27", time: "10:00", mechanic: "Carlos Rodríguez" },
-    { id: "CITA-003", client: "Carlos Ruiz", vehicle: "Yamaha FZ 2021 (DEF-456)", service: "Revisión general", date: "2025-10-28", time: "14:00", mechanic: "Ana Fernández" },
-  ]);
+  // const [appointments, setAppointments] = React.useState([
+  //   { id: "CITA-001", client: "Juan Pérez", vehicle: "Toyota Corolla 2020 (ABC-123)", service: "Cambio de aceite", date: "2025-10-27", time: "09:00", mechanic: "Luis González" },
+  //   { id: "CITA-002", client: "María García", vehicle: "Honda Civic 2019 (XYZ-789)", service: "Servicio de frenos", date: "2025-10-27", time: "10:00", mechanic: "Carlos Rodríguez" },
+  //   { id: "CITA-003", client: "Carlos Ruiz", vehicle: "Yamaha FZ 2021 (DEF-456)", service: "Revisión general", date: "2025-10-28", time: "14:00", mechanic: "Ana Fernández" },
+  // ]);
 
   // Estado compartido de servicios (mock para demo)
   // const [services, setServices] = React.useState<Service[]>([
@@ -277,10 +279,10 @@ export default function AdminGateway() {
         <CreateUserDialog createUser={createUser} open={openCreateUser} onClose={() => setOpenCreateUser(false)} />
         <SearchUserDialog users={users} open={openSearchUser} onClose={() => setOpenSearchUser(false)} />
         <VehiclesDialog vehicles={vehicles} open={openVehicles} onClose={() => setOpenVehicles(false)} />
-        <ScheduleAppointmentDialog open={openSchedule} onClose={() => setOpenSchedule(false)} />
-        <DeleteUserDialog open={openDeleteUser} onClose={() => setOpenDeleteUser(false)} />
+        <ScheduleAppointmentDialog users={users} services={services} vehicles={vehicles} createAppointment={createAppointment} open={openSchedule} onClose={() => setOpenSchedule(false)} />
         <ReassignAppointmentDialog open={openReassign} onClose={() => setOpenReassign(false)} appointments={appointments} setAppointments={setAppointments} />
         <CancelAppointmentDialog open={openCancel} onClose={() => setOpenCancel(false)} appointments={appointments} setAppointments={setAppointments} />
+        <DeleteUserDialog open={openDeleteUser} onClose={() => setOpenDeleteUser(false)} />
         <CreateServiceDialog open={openCreateService} onClose={() => setOpenCreateService(false)} onCreate={createService} />
         <ServicesCatalogDialog updateService={updateService} open={openCatalog} onClose={() => setOpenCatalog(false)} services={services} setServices={setServices} />
         {/* <DeleteServiceDialog open={openDeleteService} onClose={() => setOpenDeleteService(false)} services={services} setServices={setServices} /> */}

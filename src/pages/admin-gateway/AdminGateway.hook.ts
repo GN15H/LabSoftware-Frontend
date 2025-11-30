@@ -8,6 +8,7 @@ import { Appointment } from "@/domain/models/Appointment";
 import { User } from "@/domain/models/User";
 import { Service } from "@/domain/models/Service";
 import { SupplierData, SupplyData, UserData } from "./AdminGateway.types";
+import { AppointmentData } from "../client-gateway/ClientGateway.types";
 
 
 export function useAdminGateway() {
@@ -84,6 +85,13 @@ export function useAdminGateway() {
     }
   }
 
+  const createAppointment = async (data: AppointmentData) => {
+    const createdAppointment: Appointment | null = await controller.createAppointment(data);
+    if (createdAppointment != null) {
+      window.location.reload();
+    }
+  }
+
   const createUser = async (data: UserData) => {
     const createdUser: User | null = await controller.createUser(data);
     if (createdUser != null) {
@@ -124,6 +132,7 @@ export function useAdminGateway() {
     createService, updateService,
     createSupply, updateSupply,
     createSupplier, updateSupplier,
+    createAppointment,
     createUser
   }
 }
