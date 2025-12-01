@@ -43,6 +43,20 @@ export function useAdminGateway() {
     }
   }
 
+  const removeService = async (id: number) => {
+    const deleted: boolean = await controller.removeService(id);
+    if (deleted) {
+      setServices(prev => {
+        const toBeDeletedService = prev.find(s => s.id == id);
+        if (toBeDeletedService == undefined) return prev;
+        let newArr = [...prev];
+        const toBeDeletedServiceIndex = newArr.indexOf(toBeDeletedService);
+        newArr.splice(toBeDeletedServiceIndex, 1);
+        return newArr;
+      });
+    }
+  }
+
   const createSupply = async (data: SupplyData) => {
     const createdSupply: Supply | null = await controller.createSupply(data);
     if (createdSupply != null) {
@@ -64,6 +78,20 @@ export function useAdminGateway() {
     }
   }
 
+  const removeSupply = async (id: number) => {
+    const deleted: boolean = await controller.removeSupply(id);
+    if (deleted) {
+      setSupplies(toBeDeletedSupply => {
+        const toBeDeletedService = toBeDeletedSupply.find(s => s.id == id);
+        if (toBeDeletedService == undefined) return toBeDeletedSupply;
+        let newArr = [...toBeDeletedSupply];
+        const toBeDeletedSupplyIndex = newArr.indexOf(toBeDeletedService);
+        newArr.splice(toBeDeletedSupplyIndex, 1);
+        return newArr;
+      });
+    }
+  }
+
   const createSupplier = async (data: SupplierData) => {
     const createdSupplier: Supplier | null = await controller.createSupplier(data);
     if (createdSupplier != null) {
@@ -80,6 +108,20 @@ export function useAdminGateway() {
         let newArr = [...prev];
         const toBeUpdatedSupplierIndex = newArr.indexOf(toBeUpdatedSupplier);
         newArr[toBeUpdatedSupplierIndex] = updatedSupplier;
+        return newArr;
+      });
+    }
+  }
+
+  const removeSupplier = async (id: number) => {
+    const deleted: boolean = await controller.removeSupplier(id);
+    if (deleted) {
+      setSuppliers(toBeDeletedSupply => {
+        const toBeDeletedSupplier = toBeDeletedSupply.find(s => s.id == id);
+        if (toBeDeletedSupplier == undefined) return toBeDeletedSupply;
+        let newArr = [...toBeDeletedSupply];
+        const toBeDeletedSupplierIndex = newArr.indexOf(toBeDeletedSupplier);
+        newArr.splice(toBeDeletedSupplierIndex, 1);
         return newArr;
       });
     }
@@ -127,6 +169,19 @@ export function useAdminGateway() {
     }
   }
 
+  const removeUser = async (id: number) => {
+    const deleted: boolean = await controller.removeUser(id);
+    if (deleted) {
+      setUsers(prev => {
+        const toBeDeletedUser = prev.find(s => s.id == id);
+        if (toBeDeletedUser == undefined) return prev;
+        let newArr = [...prev];
+        const toBeDeletedUserIndex = newArr.indexOf(toBeDeletedUser);
+        newArr.splice(toBeDeletedUserIndex, 1);
+        return newArr;
+      });
+    }
+  }
   useEffect(() => {
     const profileUnserialized = localStorage.getItem('profile')
     if (profileUnserialized == null) {
@@ -157,10 +212,10 @@ export function useAdminGateway() {
     users, setUsers,
     vehicles, setVehicles,
     appointments, setAppointments,
-    createService, updateService,
-    createSupply, updateSupply,
-    createSupplier, updateSupplier,
+    createService, updateService, removeService,
+    createSupply, updateSupply, removeSupply,
+    createSupplier, updateSupplier, removeSupplier,
     createAppointment, updateAppointment, cancelAppointment,
-    createUser
+    createUser, removeUser
   }
 }

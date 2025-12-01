@@ -1,5 +1,4 @@
 import React from "react";
-import { Service } from "../AdminGateway";
 import {
   Typography,
   Box,
@@ -13,15 +12,18 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { DangerBtn, GhostBtn, ListItemCard } from "../AdminGateway.components";
+import { Service } from "@/domain/models/Service";
 
-export function DeleteServiceDialog({
-  open, onClose, services, setServices
-}: {
+interface DeleteServiceDialogProps {
   open: boolean;
   onClose: () => void;
   services: Service[];
-  setServices: React.Dispatch<React.SetStateAction<Service[]>>;
-}) {
+  removeService: (id: number) => void;
+}
+
+export function DeleteServiceDialog({
+  open, onClose, services, removeService
+}: DeleteServiceDialogProps) {
   const [query, setQuery] = React.useState("");
   const [selected, setSelected] = React.useState<Service | null>(null);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -31,13 +33,13 @@ export function DeleteServiceDialog({
   const filtered = services.filter(s => {
     const q = query.toLowerCase().trim();
     if (!q) return true;
-    return s.id.toLowerCase().includes(q) || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q);
+    return s.name.toLowerCase().includes(q);
   });
 
   const askDelete = (srv: Service) => { setSelected(srv); setConfirmOpen(true); };
   const executeDelete = () => {
     if (!selected) return;
-    setServices(prev => prev.filter(s => s.id !== selected.id));
+    removeService(selected.id);
     setConfirmOpen(false);
     onClose();
   };
@@ -69,7 +71,7 @@ export function DeleteServiceDialog({
                 <Box>
                   <Typography sx={{ fontWeight: 'bold', color: '#2c3e50' }}>{s.id} • {s.name}</Typography>
                   <Typography sx={{ fontSize: '.85rem', color: '#7f8c8d' }}>
-                    {s.category} • ${s.price.toLocaleString()} • {s.duration} min
+                    {s.name} • ${s.price.toLocaleString()}
                   </Typography>
                 </Box>
                 <IconButton aria-label="Eliminar" color="error" onClick={(e) => { e.stopPropagation(); askDelete(s); }}>
@@ -92,7 +94,6 @@ export function DeleteServiceDialog({
           <Box sx={{ backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: 2, p: 2, textAlign: 'center' }}>
             <Typography>¿Eliminar el servicio?</Typography>
             <Typography fontWeight={700} sx={{ my: 1 }}>{selected?.id} — {selected?.name}</Typography>
-            <Typography fontSize=".9rem">{selected?.category} • ${selected ? selected.price.toLocaleString() : ""} • {selected?.duration} min</Typography>
           </Box>
         </DialogContent>
         <DialogActions>

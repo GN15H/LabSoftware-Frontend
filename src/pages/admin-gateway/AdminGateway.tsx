@@ -105,11 +105,11 @@ export default function AdminGateway() {
     suppliers, setSuppliers,
     users, //setUsers,
     vehicles, //setVehicles,
-    createService, updateService,
-    createSupply, updateSupply,
-    createSupplier, updateSupplier,
+    createService, updateService, removeService,
+    createSupply, updateSupply, removeSupply,
+    createSupplier, updateSupplier, removeSupplier,
     createAppointment, updateAppointment, cancelAppointment,
-    createUser,
+    createUser, removeUser,
     appointments, //setAppointments
   } = useAdminGateway();
 
@@ -282,12 +282,14 @@ export default function AdminGateway() {
         <ScheduleAppointmentDialog users={users} services={services} vehicles={vehicles} createAppointment={createAppointment} open={openSchedule} onClose={() => setOpenSchedule(false)} />
         <ReassignAppointmentDialog rescheduleAppointment={updateAppointment} open={openReassign} onClose={() => setOpenReassign(false)} appointments={appointments} />
         <CancelAppointmentDialog open={openCancel} onClose={() => setOpenCancel(false)} appointments={appointments} cancelAppointment={cancelAppointment} />
-        <DeleteUserDialog open={openDeleteUser} onClose={() => setOpenDeleteUser(false)} />
+        <DeleteUserDialog users={users} removeUser={removeUser} open={openDeleteUser} onClose={() => setOpenDeleteUser(false)} />
         <CreateServiceDialog open={openCreateService} onClose={() => setOpenCreateService(false)} onCreate={createService} />
         <ServicesCatalogDialog updateService={updateService} open={openCatalog} onClose={() => setOpenCatalog(false)} services={services} setServices={setServices} />
-        {/* <DeleteServiceDialog open={openDeleteService} onClose={() => setOpenDeleteService(false)} services={services} setServices={setServices} /> */}
-        <ProvidersDialog updateSupplier={updateSupplier} createSupplier={createSupplier} open={openProviders} onClose={() => setOpenProviders(false)} providers={suppliers} setProviders={setSuppliers} />
-        <SparepartsDialog open={openSpareparts} onClose={() => setOpenSpareparts(false)} parts={supplies} setParts={setSupplies} suppliers={suppliers} createSupply={createSupply} updateSupply={updateSupply} />
+        <DeleteServiceDialog open={openDeleteService} onClose={() => setOpenDeleteService(false)} services={services} removeService={removeService} />
+        <ProvidersDialog removeSupplier={removeSupplier} updateSupplier={updateSupplier}
+          createSupplier={createSupplier} open={openProviders} onClose={() => setOpenProviders(false)} providers={suppliers} setProviders={setSuppliers} />
+        <SparepartsDialog open={openSpareparts} onClose={() => setOpenSpareparts(false)}
+          parts={supplies} setParts={setSupplies} suppliers={suppliers} createSupply={createSupply} updateSupply={updateSupply} removeSupply={removeSupply} />
         {/* <ReportsDialog open={openReports} onClose={() => setOpenReports(false)} kind={reportKind} appointments={appointments} services={services} parts={parts} providers={providers} /> */}
       </Box>
     </ThemeProvider>

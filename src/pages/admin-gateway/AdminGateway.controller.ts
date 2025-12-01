@@ -145,6 +145,16 @@ export class AdminGatewayController {
     return newService;
   }
 
+  async removeService(id: number): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.delete(process.env.NEXT_PUBLIC_BACKEND_URI + 'services/' + id.toString(), {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    return request.status == 200;
+  }
+
   async createSupply(data: SupplyData): Promise<Supply | null> {
     const profile = JSON.parse(localStorage.getItem('profile') ?? '');
     const request = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'supplies', {
@@ -183,6 +193,17 @@ export class AdminGatewayController {
     return newSupply;
   }
 
+
+  async removeSupply(id: number): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.delete(process.env.NEXT_PUBLIC_BACKEND_URI + 'supplies/' + id.toString(), {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    return request.status == 200;
+  }
+
   async createSupplier(data: SupplierData): Promise<Supplier | null> {
     const profile = JSON.parse(localStorage.getItem('profile') ?? '');
     const request = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'suppliers', {
@@ -213,6 +234,16 @@ export class AdminGatewayController {
     if (request.status != 200) return null;
     const newSupplier: Supplier = Supplier.fromMap(request.data);
     return newSupplier;
+  }
+
+  async removeSupplier(id: number): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.delete(process.env.NEXT_PUBLIC_BACKEND_URI + 'suppliers/' + id.toString(), {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    return request.status == 200;
   }
 
   async createAppointment(value: AppointmentData): Promise<Appointment | null> {
@@ -281,4 +312,13 @@ export class AdminGatewayController {
     return newUser;
   }
 
+  async removeUser(id: number): Promise<boolean> {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const request = await axios.delete(process.env.NEXT_PUBLIC_BACKEND_URI + 'users/' + id.toString(), {
+      headers: {
+        Authorization: `Bearer ${profile['token']}`
+      }
+    })
+    return request.status == 200;
+  }
 }

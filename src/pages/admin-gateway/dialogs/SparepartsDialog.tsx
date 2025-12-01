@@ -1,5 +1,4 @@
 import React from "react";
-import { Part, Provider } from "../AdminGateway";
 import Grid from "@mui/material/Grid";
 import {
   Typography,
@@ -32,10 +31,11 @@ interface SparepartsDialogProps {
   suppliers: Supplier[]
   createSupply: (data: SupplyData) => void;
   updateSupply: (id: number, data: SupplyData) => void;
+  removeSupply: (id: number) => void;
 }
 
 export function SparepartsDialog({
-  open, onClose, parts, setParts, suppliers, createSupply, updateSupply
+  open, onClose, parts, suppliers, createSupply, updateSupply, removeSupply
 }: SparepartsDialogProps) {
   const [query, setQuery] = React.useState("");
   const [editing, setEditing] = React.useState<Supply | null>(null);
@@ -101,7 +101,7 @@ export function SparepartsDialog({
                     <IconButton aria-label="Eliminar" color="error" onClick={(e) => {
                       e.stopPropagation();
                       console.log("remover")
-                      // remove(p.id);
+                      removeSupply(p.id);
                     }}>
                       <DeleteOutlineIcon />
                     </IconButton>

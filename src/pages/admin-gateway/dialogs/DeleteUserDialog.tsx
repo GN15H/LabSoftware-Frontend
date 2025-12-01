@@ -11,24 +11,23 @@ import SearchIcon from "@mui/icons-material/Search";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import React from "react";
 import { DangerBtn, GhostBtn, ListItemCard } from "../AdminGateway.components";
+import { User } from "@/domain/models/User";
 
 interface DeleteUserDialogProps {
   open: boolean;
   onClose: () => void;
+  removeUser: (id: number) => void;
+  users: User[];
 }
 
 export function DeleteUserDialog({
   open,
   onClose,
+  removeUser,
+  users,
 }: DeleteUserDialogProps) {
-  type User = { id: string; name: string; doc: string; role: string; meta?: string };
 
   const [query, setQuery] = React.useState("");
-  const [users, setUsers] = React.useState<User[]>([
-    { id: "user1", name: "Juan Pérez", doc: "CC: 12345678", role: "Cliente", meta: "2 vehículos" },
-    { id: "user2", name: "Carlos Rodríguez", doc: "CC: 87654321", role: "Mecánico", meta: "15 citas" },
-    { id: "user3", name: "María García", doc: "CC: 11223344", role: "Cliente", meta: "1 vehículo" },
-  ]);
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [toDelete, setToDelete] = React.useState<User | null>(null);
@@ -37,9 +36,7 @@ export function DeleteUserDialog({
     const q = query.toLowerCase().trim();
     if (!q) return true;
     return (
-      u.name.toLowerCase().includes(q) ||
-      u.doc.toLowerCase().includes(q) ||
-      u.role.toLowerCase().includes(q)
+      u.name.toLowerCase().includes(q)
     );
   });
 
@@ -50,7 +47,7 @@ export function DeleteUserDialog({
 
   const executeDelete = () => {
     if (!toDelete) return;
-    setUsers((prev) => prev.filter((u) => u.id !== toDelete.id));
+    removeUser(toDelete.id);
     setConfirmOpen(false);
     setToDelete(null);
     // TODO: aquí haces tu DELETE real a la API
@@ -105,7 +102,7 @@ export function DeleteUserDialog({
                     {u.name}
                   </Typography>
                   <Typography sx={{ fontSize: ".85rem", color: "#7f8c8d" }}>
-                    {u.doc} • {u.role} {u.meta ? `• ${u.meta}` : ""}
+                    {u.name + ' ' + u.lastName} • {u.userType}
                   </Typography>
                 </Box>
 

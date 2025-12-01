@@ -27,10 +27,11 @@ interface ProvidersDialogProps {
   setProviders: React.Dispatch<React.SetStateAction<Supplier[]>>;
   createSupplier: (data: SupplierData) => void;
   updateSupplier: (id: number, data: SupplierData) => void;
+  removeSupplier: (id: number) => void;
 }
 
 export function ProvidersDialog({
-  open, onClose, providers, setProviders, createSupplier, updateSupplier
+  open, onClose, providers, setProviders, createSupplier, updateSupplier, removeSupplier
 }: ProvidersDialogProps) {
   const [query, setQuery] = React.useState("");
   const [form, setForm] = React.useState<SupplierData>({ name: "", phone: "", email: "" });
@@ -87,7 +88,7 @@ export function ProvidersDialog({
                     <Chip label="Editar" />
                     <IconButton aria-label="Eliminar" color="error" onClick={(e) => {
                       e.stopPropagation();
-                      console.log("remover item");
+                      removeSupplier(p.id);
                       // remove(p.id);
                     }}>
                       <DeleteOutlineIcon />
