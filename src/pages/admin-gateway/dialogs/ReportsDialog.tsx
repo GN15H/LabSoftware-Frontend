@@ -8,26 +8,32 @@ import {
 } from "@mui/material";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { GhostBtn, PrimaryBtn } from "../AdminGateway.components";
+import { Service } from "@/domain/models/Service";
+import { Appointment } from "@/domain/models/Appointment";
+import { Supply } from "@/domain/models/Supply";
+import { Supplier } from "@/domain/models/Supplier";
+
+interface ReportsDialogProps {
+  open: boolean;
+  onClose: () => void;
+  kind: "citas" | "mecanicos" | "inventario" | "financiero" | null;
+  appointments: Appointment[];
+  services: Service[];
+  supplies: Supply[];
+  suppliers: Supplier[];
+}
 
 export function ReportsDialog({
   open,
   onClose,
   kind,
   appointments,
-  services,
-  parts,
-  providers,
-}: {
-  open: boolean;
-  onClose: () => void;
-  kind: "citas" | "mecanicos" | "inventario" | "financiero" | null;
-  appointments: Array<{ id: string; client: string; vehicle: string; service: string; date: string; time: string; mechanic: string }>;
-  services: Array<{ id: string; name: string; category: string; price: number; duration: number; description?: string }>;
-  parts: Array<{ id: string; name: string; sku: string; stock: number; minStock: number; price: number; providerId?: string }>;
-  providers: Array<{ id: string; name: string; contact: string; phone: string; email: string }>;
-}) {
+  // services,
+  supplies: parts,
+  suppliers: providers,
+}: ReportsDialogProps) {
 
   // Helpers de exportación
   const exportExcel = (rows: any[], filename: string) => {
@@ -41,7 +47,7 @@ export function ReportsDialog({
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     doc.setFontSize(14);
     doc.text(title, 40, 40);
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [head],
       body,
       startY: 60,
@@ -62,19 +68,25 @@ export function ReportsDialog({
       case "citas": {
         const head = ["ID", "Cliente", "Vehículo", "Servicio", "Fecha", "Hora", "Mecánico"];
         const rows = appointments.map(a => ({
-          ID: a.id, Cliente: a.client, Vehículo: a.vehicle, Servicio: a.service,
-          Fecha: a.date, Hora: a.time, Mecánico: a.mechanic
+          ID: a.id, Cliente: a.vehicle.ownerId, Vehículo: `${a.vehicle.brand} ${a.vehicle.series} ${a.vehicle.plateNumber}`, Servicio: (() => {
+            let services = '';
+            a.services.forEach(s =>
+              services += ` ${s.name}`
+            )
+            return services;
+          })(),
+          Fecha: a.date, Mecánico: `${a.mechanic.name} ${a.mechanic.lastName}`
         }));
-        const body = rows.map(r => [r.ID, r.Cliente, r.Vehículo, r.Servicio, r.Fecha, r.Hora, r.Mecánico]);
+        const body = rows.map(r => [r.ID, r.Cliente, r.Vehículo, r.Servicio, r.Fecha, r.Mecánico]);
         return { head, rows, body, title: "Reporte de Citas", filename: "reporte_citas" };
       }
       case "mecanicos": {
         // Agregado por mecánico
         const agg = new Map<string, { citas: number }>();
         appointments.forEach(a => {
-          const m = agg.get(a.mechanic) || { citas: 0 };
+          const m = agg.get(a.mechanic.email) || { citas: 0 };
           m.citas += 1;
-          agg.set(a.mechanic, m);
+          agg.set(a.mechanic.email, m);
         });
         const head = ["Mecánico", "Citas Atendidas"];
         const rows = Array.from(agg.entries()).map(([mech, v]) => ({ Mecánico: mech, "Citas Atendidas": v.citas }));
@@ -82,28 +94,28 @@ export function ReportsDialog({
         return { head, rows, body, title: "Reporte de Mecánicos", filename: "reporte_mecanicos" };
       }
       case "inventario": {
-        const head = ["ID", "Nombre", "SKU", "Stock", "Mín.", "Precio", "Proveedor"];
+        const head = ["ID", "Nombre", "Stock", "Mín.", "Precio", "Proveedor"];
         const rows = parts.map(p => ({
-          ID: p.id, Nombre: p.name, SKU: p.sku, Stock: p.stock, "Mín.": p.minStock,
-          Precio: p.price, Proveedor: p.providerId ? (providers.find(pr => pr.id === p.providerId)?.name ?? "-") : "-"
+          ID: p.id, Nombre: p.name, Stock: p.amount, "Mín.": p.minStock,
+          Precio: p.price, Proveedor: p.supplierId ? (providers.find(pr => pr.id === p.supplierId)?.name ?? "-") : "-"
         }));
-        const body = rows.map(r => [r.ID, r.Nombre, r.SKU, r.Stock, r["Mín."], r.Precio.toLocaleString(), r.Proveedor]);
+        const body = rows.map(r => [r.ID, r.Nombre, r.Stock, r["Mín."], r.Precio.toLocaleString(), r.Proveedor]);
         return { head, rows, body, title: "Reporte de Inventario", filename: "reporte_inventario" };
       }
       case "financiero": {
         // unir citas con precio del servicio por nombre
-        const priceByService = new Map(services.map(s => [s.name, s.price]));
-        let total = 0;
-        const head = ["Cita", "Servicio", "Precio (COP)", "Fecha", "Mecánico", "Cliente"];
+        let total: bigint = BigInt(0);
+        const head = ["Cita", "Servicio", "Precio (COP)", "Fecha", "Mecánico", "Vehículo"];
         const rows = appointments.map(a => {
-          const precio = priceByService.get(a.service) ?? 0;
+          let precio: bigint = BigInt(0);
+          a.services.forEach(s => { precio += s.price })
           total += precio;
           return {
-            Cita: a.id, Servicio: a.service, "Precio (COP)": precio,
-            Fecha: a.date, Mecánico: a.mechanic, Cliente: a.client
+            Cita: a.id, "Precio (COP)": precio.toLocaleString(),
+            Fecha: a.date, Mecánico: `${a.mechanic.name} ${a.mechanic.lastName}`, Cliente: `${a.vehicle.brand} ${a.vehicle.series} ${a.vehicle.plateNumber}`
           };
         });
-        const body = rows.map(r => [r.Cita, r.Servicio, r["Precio (COP)"].toLocaleString(), r.Fecha, r.Mecánico, r.Cliente]);
+        const body = rows.map(r => [r.Cita, , r["Precio (COP)"], r.Fecha, r.Mecánico, r.Cliente]);
         const extra = `Total facturado (estimado): $${total.toLocaleString()}`;
         return { head, rows, body, title: "Reporte Financiero (Estimado)", filename: "reporte_financiero", extra };
       }

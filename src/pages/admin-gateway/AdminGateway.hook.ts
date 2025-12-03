@@ -65,7 +65,9 @@ export function useAdminGateway() {
   }
 
   const updateSupply = async (id: number, data: SupplyData) => {
+    console.log('huh');
     const updatedSupply: Supply | null = await controller.updateSupply(id, data);
+    console.log('huhmas');
     if (updatedSupply != null) {
       setSupplies(prev => {
         const toBeUpdatedSupply = prev.find(s => s.id == id);

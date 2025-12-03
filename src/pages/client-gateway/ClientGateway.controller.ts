@@ -67,6 +67,7 @@ export class ClientGatewayController {
 
   async createAppointment(value: AppointmentData): Promise<boolean> {
     const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    console.log("ejem?????")
     const request = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointments', {
       appointment_date: value.date + "T" + value.hour + ":00.000Z",
       vehicle_id: value.vehicle,
@@ -76,6 +77,7 @@ export class ClientGatewayController {
         Authorization: `Bearer ${profile['token']}`
       }
     })
+    console.log("la hijueputa mierda", request);
     if (request.status == 201) {
       if (request.data['response'] != undefined && (request.data['response'] == 'No hay bahias' ||
         request.data['response'] == 'No hay mecanicos'))

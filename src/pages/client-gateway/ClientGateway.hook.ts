@@ -91,11 +91,11 @@ export function useClientGateway() {
     const created = await controller.createAppointment(apptData);
     if (created) {
       setSnack({ open: true, sev: "success", message: "Cita agendada con éxito" });
+      setTimeout(() => window.location.reload(), 3000);
     }
     else
-      setSnack({ open: true, sev: "error", message: "Error agendando la cita" });
+      setSnack({ open: true, sev: "error", message: "Error agendando la cita, no hay recursos disponibles" });
     setApptOpen(false);
-    setTimeout(() => window.location.reload(), 2000);
   };
 
   const executeCancelAppointment = async (id: number) => {

@@ -290,7 +290,7 @@ export default function AdminGateway() {
           createSupplier={createSupplier} open={openProviders} onClose={() => setOpenProviders(false)} providers={suppliers} setProviders={setSuppliers} />
         <SparepartsDialog open={openSpareparts} onClose={() => setOpenSpareparts(false)}
           parts={supplies} setParts={setSupplies} suppliers={suppliers} createSupply={createSupply} updateSupply={updateSupply} removeSupply={removeSupply} />
-        {/* <ReportsDialog open={openReports} onClose={() => setOpenReports(false)} kind={reportKind} appointments={appointments} services={services} parts={parts} providers={providers} /> */}
+        <ReportsDialog open={openReports} onClose={() => setOpenReports(false)} kind={reportKind} appointments={appointments} services={services} supplies={supplies} suppliers={suppliers} />
       </Box>
     </ThemeProvider>
   );

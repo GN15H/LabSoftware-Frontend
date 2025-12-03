@@ -105,7 +105,7 @@ export default function MechanicPortalMUI() {
           </Grid>
 
           {/* Sidebar */}
-          <MechanicSidebar />
+          {/* <MechanicSidebar /> */}
         </Grid>
       </Container>
 

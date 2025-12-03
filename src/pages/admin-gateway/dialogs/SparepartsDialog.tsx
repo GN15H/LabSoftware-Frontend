@@ -125,7 +125,7 @@ export function SparepartsDialog({
                 <TextField label="Precio (COP)" type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} fullWidth />
                 <FormControl fullWidth>
                   <InputLabel>Proveedor</InputLabel>
-                  <Select label="Proveedor" value={form.supplierId ?? ""} onChange={e => setForm({ ...form, supplierId: e.target.value })}>
+                  <Select disabled={editing != null} label="Proveedor" value={form.supplierId ?? ""} onChange={e => setForm({ ...form, supplierId: e.target.value })}>
                     <MenuItem value="">— Sin proveedor —</MenuItem>
                     {suppliers.map(p => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
                   </Select>
@@ -134,8 +134,10 @@ export function SparepartsDialog({
                 <Stack direction="row" spacing={1}>
                   <GhostBtn onClick={clearForm}>Limpiar</GhostBtn>
                   <PrimaryBtn onClick={() => {
-                    if (editing)
+                    if (editing) {
+                      console.log("editando hijueputa");
                       updateSupply(editing.id, form);
+                    }
                     else
                       createSupply(form);
                   }} startIcon={<AddIcon />} disabled={!form.name || !form.price || !form.supplierId}>

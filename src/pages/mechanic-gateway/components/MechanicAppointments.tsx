@@ -77,7 +77,7 @@ export const MechanicAppointment = ({ appointment, setSelectedAppointment, openP
 
 
       <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
-        <Button disabled={appointment.appointmentState == 'pending' || appointment.appointmentState == 'completed'} onClick={() => {
+        <Button disabled={appointment.appointmentState == 'pending' || appointment.appointmentState == 'completed' || appointment.appointmentState == 'paid'} onClick={() => {
           // startService(a.id)
           advanceWorkflow(appointment.id, getNextState(appointment.appointmentState));
           console.log('iniciar servicio');
