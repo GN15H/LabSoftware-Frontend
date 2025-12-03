@@ -2,7 +2,7 @@ import { Appointment, IAppointmentMap } from "@/domain/models/Appointment";
 import { ISupplyMap, Supply } from "@/domain/models/Supply";
 import { AppointmentStateType } from "@/domain/models/types";
 import axios from "axios";
-import { AppointmentSupplies, ProcedureData } from "./MechanicGateway.types";
+import { AppointmentSupplies, EvidenceData, ProcedureData } from "./MechanicGateway.types";
 
 export class MechanicGatewayController {
   async fetchData() {
@@ -61,7 +61,7 @@ export class MechanicGatewayController {
     const updateReq = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointments/procedures-services/' + appointmentId.toString(),
       {
         description: data.description,
-        supplies: data.supplies.map(s => ({ supply_id: s.supplyId, amount: s.amount }))
+        supplies: data.supplies.map(s => ({ supply_id: s.supply, amount: s.amount }))
       }
       , {
         headers: {
@@ -89,6 +89,32 @@ export class MechanicGatewayController {
         }
       }
     );
+    return updateReq.status == 201;
+  }
+
+  async createAppointmentEvidence(appointmentId: number, evidenceData: EvidenceData) {
+    console.log(appointmentId, evidenceData)
+    if (evidenceData.file == null) return;
+    const formData = new FormData();
+    formData.append("image", evidenceData.file);
+    formData.append("data", JSON.stringify({
+      appointment_id: appointmentId,
+      description: "descri"
+    }));
+
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+
+    const updateReq = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'evidences/upload',
+      formData
+      , {
+        headers: {
+          Authorization: `Bearer ${profile['token']}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    console.log(updateReq);
+    console.log(updateReq.data);
     return updateReq.status == 201;
   }
 }

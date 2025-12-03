@@ -4,7 +4,7 @@ import { MechanicGatewayController } from "./MechanicGateway.controller";
 import { Appointment } from "@/domain/models/Appointment";
 import { AppointmentStateType } from "@/domain/models/types";
 import { Supply } from "@/domain/models/Supply";
-import { AppointmentSupplies, ProcedureData } from "./MechanicGateway.types";
+import { AppointmentSupplies, EvidenceData, ProcedureData } from "./MechanicGateway.types";
 
 export function useMechanicGateway() {
 
@@ -22,6 +22,10 @@ export function useMechanicGateway() {
   const [procedureData, setProcedureData] = useState<ProcedureData>({
     description: '',
     supplies: []
+  })
+
+  const [evidenceData, setEvidenceData] = useState<EvidenceData>({
+    file: null
   })
 
   const [selectedAppointment, setSelectedAppointment] = useState<number>(0);
@@ -91,6 +95,17 @@ export function useMechanicGateway() {
       alert("Datos guardados");
     else
       alert("Los datos no se pudieron guardadr")
+  }
+
+  const createEvidence = async (appointmentId: number, evidenceData: EvidenceData) => {
+    const success = await controller.createAppointmentEvidence(appointmentId, evidenceData);
+    if (success) {
+      alert("Datos guardados");
+      setPhotoDialogOpen(false);
+    } else {
+      alert("Los datos no se pudieron guardadr")
+      setPhotoDialogOpen(false);
+    }
   }
 
   const handleBudgetResponse = (approved: boolean) => {
@@ -165,9 +180,11 @@ export function useMechanicGateway() {
     photoDialogOpen, setPhotoDialogOpen,
     photoStage, setPhotoStage,
     photos, setPhotos,
+    evidenceData, setEvidenceData,
     fileInputRef,
     createProcedures,
     createAppointmentSupplies,
+    createEvidence,
     advanceWorkflowState,
     handleBudgetResponse,
     openPhotoModal,

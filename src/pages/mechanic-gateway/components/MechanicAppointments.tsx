@@ -85,6 +85,7 @@ export const MechanicAppointment = ({ appointment, setSelectedAppointment, openP
         {appointment.appointmentState == 'ongoing' &&
           <Button onClick={() => {
             console.log('Subir fotos');
+            setSelectedAppointment(appointment.id)
             openPhotoModal('recibido')
           }} sx={{ bgcolor: PALETA.celeste, color: '#fff', '&:hover': { bgcolor: PALETA.celesteHover } }} startIcon={<PhotoCameraIcon />} >
             Subir Fotos

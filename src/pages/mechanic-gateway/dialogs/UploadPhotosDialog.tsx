@@ -2,7 +2,9 @@ import { Dialog, DialogTitle, Box, IconButton, Button, DialogContent, DialogActi
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CloseIcon from "@mui/icons-material/Close";
 import { PALETA } from "../MechanicGateway";
-import { RefObject, SetStateAction } from "react";
+import { ChangeEvent, RefObject, SetStateAction, useState } from "react";
+import { EvidenceData } from "../MechanicGateway.types";
+import { Appointment } from "@/domain/models/Appointment";
 
 interface UploadPhotosDialogProps {
   photoDialogOpen: boolean;
@@ -11,10 +13,26 @@ interface UploadPhotosDialogProps {
   savePhotos: () => void;
   fileInputRef: RefObject<HTMLInputElement | null>;
   photos: Array<{ name: string; url?: string }>;
+  evidenceData: EvidenceData;
+  appointment: number;
+  setEvidenceData: React.Dispatch<SetStateAction<EvidenceData>>;
+  createEvidence: (apointmentId: number, evidenceData: EvidenceData) => void;
 }
 
-export const UploadPhotosDialog = ({ photos, savePhotos, photoDialogOpen, setPhotoDialogOpen, onChoosePhotos, fileInputRef }: UploadPhotosDialogProps) => {
+export const UploadPhotosDialog = ({ photos, savePhotos, photoDialogOpen, setPhotoDialogOpen, onChoosePhotos, fileInputRef, evidenceData, setEvidenceData, createEvidence, appointment }: UploadPhotosDialogProps) => {
+
+  const [preview, setPreview] = useState<string>("");
+  const [uploadedUrl, setUploadedUrl] = useState(null);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files == null) return;
+    const selected = e.target.files[0];
+    setEvidenceData({ file: selected });
+    setPreview(URL.createObjectURL(selected));
+    console.log(e.target.files);
+  };
   return (
+
 
     <Dialog open={photoDialogOpen} onClose={() => setPhotoDialogOpen(false)} fullWidth maxWidth="md">
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -38,7 +56,7 @@ export const UploadPhotosDialog = ({ photos, savePhotos, photoDialogOpen, setPho
             return map['recibido'] ?? 'Toma las fotografías necesarias para este paso';
           })()}
         </Typography>
-
+        {preview && <img src={preview} width={150} alt="preview" />}
         <Paper variant="outlined" sx={{ p: 3, textAlign: 'center', borderStyle: 'dashed', borderColor: PALETA.grisBorde, '&:hover': { borderColor: PALETA.azul, bgcolor: '#f8f9fa' } }}>
           <PhotoCameraIcon sx={{ fontSize: 48, color: '#bdc3c7', mb: 1 }} />
           <Typography sx={{ color: PALETA.textoSuave }}>
@@ -47,7 +65,7 @@ export const UploadPhotosDialog = ({ photos, savePhotos, photoDialogOpen, setPho
           <Button onClick={() => fileInputRef.current?.click()} sx={{ mt: 1 }} variant="contained">
             Seleccionar fotos
           </Button>
-          <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={onChoosePhotos} />
+          <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleFileChange} />
         </Paper>
 
         {/* Grid de fotos */}
@@ -66,7 +84,9 @@ export const UploadPhotosDialog = ({ photos, savePhotos, photoDialogOpen, setPho
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setPhotoDialogOpen(false)} sx={{ bgcolor: '#eee7e1', color: 'rgb(80,80,80)', '&:hover': { bgcolor: '#dad6d3' } }}>Cerrar</Button>
-        <Button onClick={savePhotos} sx={{ bgcolor: PALETA.naranja, color: '#fff', '&:hover': { bgcolor: PALETA.naranjaHover } }}>Guardar Fotos</Button>
+        <Button onClick={() => {
+          createEvidence(appointment, evidenceData);
+        }} sx={{ bgcolor: PALETA.naranja, color: '#fff', '&:hover': { bgcolor: PALETA.naranjaHover } }}>Guardar Fotos</Button>
       </DialogActions>
     </Dialog>
   );
