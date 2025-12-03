@@ -2,7 +2,7 @@ import { Appointment, IAppointmentMap } from "@/domain/models/Appointment";
 import { ISupplyMap, Supply } from "@/domain/models/Supply";
 import { AppointmentStateType } from "@/domain/models/types";
 import axios from "axios";
-import { ProcedureData } from "./MechanicGateway.types";
+import { AppointmentSupplies, ProcedureData } from "./MechanicGateway.types";
 
 export class MechanicGatewayController {
   async fetchData() {
@@ -62,6 +62,26 @@ export class MechanicGatewayController {
       {
         description: data.description,
         supplies: data.supplies.map(s => ({ supply_id: s.supplyId, amount: s.amount }))
+      }
+      , {
+        headers: {
+          Authorization: `Bearer ${profile['token']}`
+        }
+      }
+    );
+    return updateReq.status == 201;
+  }
+
+
+  async createAppointmentSupplies(appointmentId: number, supplies: AppointmentSupplies[]) {
+    const profile = JSON.parse(localStorage.getItem('profile') ?? '');
+    const updateReq = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'appointment-supplies/',
+      {
+        supplies: supplies.map(s => ({
+          supply_id: s.supply,
+          supply_amount: s.amount,
+          appointment_id: appointmentId
+        }))
       }
       , {
         headers: {

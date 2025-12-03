@@ -4,7 +4,7 @@ import { MechanicGatewayController } from "./MechanicGateway.controller";
 import { Appointment } from "@/domain/models/Appointment";
 import { AppointmentStateType } from "@/domain/models/types";
 import { Supply } from "@/domain/models/Supply";
-import { ProcedureData } from "./MechanicGateway.types";
+import { AppointmentSupplies, ProcedureData } from "./MechanicGateway.types";
 
 export function useMechanicGateway() {
 
@@ -85,6 +85,14 @@ export function useMechanicGateway() {
       alert("Los datos no se pudieron guardadr")
   }
 
+  const createAppointmentSupplies = async (appointmentId: number, supplies: AppointmentSupplies[]) => {
+    const success = await controller.createAppointmentSupplies(appointmentId, supplies);
+    if (success)
+      alert("Datos guardados");
+    else
+      alert("Los datos no se pudieron guardadr")
+  }
+
   const handleBudgetResponse = (approved: boolean) => {
     setWaitingBudget(false);
     if (approved) {
@@ -159,6 +167,7 @@ export function useMechanicGateway() {
     photos, setPhotos,
     fileInputRef,
     createProcedures,
+    createAppointmentSupplies,
     advanceWorkflowState,
     handleBudgetResponse,
     openPhotoModal,

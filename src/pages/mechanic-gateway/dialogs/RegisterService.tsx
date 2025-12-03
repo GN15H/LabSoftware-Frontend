@@ -16,11 +16,10 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, } from "react";
 import { fieldSx, PALETA } from "../MechanicGateway";
 import { Supply } from "@/domain/models/Supply";
-import { ProcedureData } from "../MechanicGateway.types";
-import { Appointment } from "@/domain/models/Appointment";
+import { AppointmentSupplies, ProcedureData } from "../MechanicGateway.types";
 
 interface SupplyItem {
   supplyId: number;
@@ -36,14 +35,15 @@ interface RegisterServiceProps {
   procedureData: ProcedureData;
   setProcedureData: React.Dispatch<SetStateAction<ProcedureData>>;
   createProcedures: (appointmentId: number, data: ProcedureData) => void;
+  createAppointmentSupplies: (appointmentId: number, supplies: AppointmentSupplies[]) => void;
 }
 
-export const RegisterService = ({ appointment, supplies, serviceDialogOpen, createProcedures, procedureData, setProcedureData, setServiceDialogOpen, saveService }: RegisterServiceProps) => {
+export const RegisterService = ({ createAppointmentSupplies, appointment, supplies, serviceDialogOpen, createProcedures, procedureData, setProcedureData, setServiceDialogOpen, saveService }: RegisterServiceProps) => {
   // const [supplyItems, setSupplyItems] = useState<SupplyItem[]>([{ supplyId: '', quantity: 1 }]);
 
   const handleAddSupply = () => {
     const newArr = [...procedureData.supplies];
-    newArr.push({ supplyId: supplies[0].id, amount: 1 });
+    newArr.push({ supply: supplies[0].id, amount: 1 });
     setProcedureData(prev => (
       { ...prev, supplies: newArr })
     );
@@ -59,7 +59,7 @@ export const RegisterService = ({ appointment, supplies, serviceDialogOpen, crea
 
   const handleSupplyChange = (index: number, supplyId: number) => {
     const newItems = [...procedureData.supplies];
-    newItems[index].supplyId = supplyId;
+    newItems[index].supply = supplyId;
     setProcedureData(prev => ({
       ...prev,
       supplies: newItems
@@ -80,6 +80,7 @@ export const RegisterService = ({ appointment, supplies, serviceDialogOpen, crea
   const handleSave = () => {
     console.log(procedureData);
     createProcedures(appointment, procedureData);
+    createAppointmentSupplies(appointment, procedureData.supplies)
     // saveService(supplyItems);
     // setSupplyItems([{ supplyId: '', quantity: 1 }]);
   };
@@ -103,8 +104,6 @@ export const RegisterService = ({ appointment, supplies, serviceDialogOpen, crea
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2}>
-          <TextField value={procedureData.description} onChange={(e) => setProcedureData(prev => ({ ...prev, description: e.target.value }))} label="Descripción del Trabajo" placeholder="Describe detalladamente el trabajo realizado..."
-            multiline minRows={3} fullWidth sx={fieldSx()} />
           <InputLabel>Repuestos</InputLabel>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
@@ -116,7 +115,7 @@ export const RegisterService = ({ appointment, supplies, serviceDialogOpen, crea
           {procedureData.supplies.map((item, index) => (
             <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
               <FormControl>
-                <Select label="Repuesto" variant="standard" value={item.supplyId} onChange={(e) => handleSupplyChange(index, e.target.value)} fullWidth={true} displayEmpty={true}>
+                <Select label="Repuesto" variant="standard" value={item.supply} onChange={(e) => handleSupplyChange(index, e.target.value)} fullWidth={true} displayEmpty={true}>
                   <MenuItem value="" disabled>Seleccionar repuesto</MenuItem>
                   {supplies.map((s) => (
                     <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>

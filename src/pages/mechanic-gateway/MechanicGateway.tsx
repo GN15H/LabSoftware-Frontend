@@ -53,6 +53,7 @@ export default function MechanicPortalMUI() {
     fileInputRef,
     advanceWorkflowState,
     createProcedures,
+    createAppointmentSupplies,
     handleBudgetResponse,
     openPhotoModal,
     onChoosePhotos,
@@ -113,7 +114,7 @@ export default function MechanicPortalMUI() {
       <UploadPhotosDialog photoDialogOpen={photoDialogOpen} setPhotoDialogOpen={setPhotoDialogOpen} onChoosePhotos={onChoosePhotos} savePhotos={savePhotos} fileInputRef={fileInputRef} photos={photos} />
 
       {/* Dialog: Registrar Servicio */}
-      <RegisterService appointment={selectedAppointment} createProcedures={createProcedures} procedureData={procedureData} setProcedureData={setProcedureData} supplies={supplies} serviceDialogOpen={serviceDialogOpen} setServiceDialogOpen={setServiceDialogOpen} saveService={saveService} />
+      <RegisterService createAppointmentSupplies={createAppointmentSupplies} appointment={selectedAppointment} createProcedures={createProcedures} procedureData={procedureData} setProcedureData={setProcedureData} supplies={supplies} serviceDialogOpen={serviceDialogOpen} setServiceDialogOpen={setServiceDialogOpen} saveService={saveService} />
 
       {/* Keyframes for pulse */}
       <style jsx global>{`

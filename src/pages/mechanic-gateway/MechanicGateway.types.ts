@@ -1,5 +1,10 @@
 
 export type ProcedureData = {
   description: string;
-  supplies: { supplyId: number; amount: number }[];
+  supplies: AppointmentSupplies[];
+}
+
+export type AppointmentSupplies = {
+  supply: number,
+  amount: number,
 }
