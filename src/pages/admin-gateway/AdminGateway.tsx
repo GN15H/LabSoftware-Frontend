@@ -11,7 +11,11 @@ import {
   Button,
   CardContent,
   Stack,
-  useMediaQuery
+  useMediaQuery,
+  CircularProgress,
+  Backdrop,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -100,6 +104,8 @@ function ModuleCard({ title, description, actions, onClickHeader }: { title: Rea
 export default function AdminGateway() {
 
   const {
+    snack, setSnack,
+    isLoading, setLoading,
     services, setServices,
     supplies, setSupplies,
     suppliers, setSuppliers,
@@ -130,29 +136,6 @@ export default function AdminGateway() {
   const [openProviders, setOpenProviders] = React.useState(false);
   const [openSpareparts, setOpenSpareparts] = React.useState(false);
   const [openReports, setOpenReports] = React.useState(false);
-
-  // Estado compartido de citas (mock para demo)
-  // const [appointments, setAppointments] = React.useState([
-  //   { id: "CITA-001", client: "Juan Pérez", vehicle: "Toyota Corolla 2020 (ABC-123)", service: "Cambio de aceite", date: "2025-10-27", time: "09:00", mechanic: "Luis González" },
-  //   { id: "CITA-002", client: "María García", vehicle: "Honda Civic 2019 (XYZ-789)", service: "Servicio de frenos", date: "2025-10-27", time: "10:00", mechanic: "Carlos Rodríguez" },
-  //   { id: "CITA-003", client: "Carlos Ruiz", vehicle: "Yamaha FZ 2021 (DEF-456)", service: "Revisión general", date: "2025-10-28", time: "14:00", mechanic: "Ana Fernández" },
-  // ]);
-
-  // Estado compartido de servicios (mock para demo)
-  // const [services, setServices] = React.useState<Service[]>([
-  //   { id: "SRV-001", name: "Cambio de aceite", category: "Mantenimiento", price: 80000, duration: 60, description: "Aceite + filtro" },
-  // ]);
-
-  const [providers, setProviders] = React.useState<Provider[]>([
-    { id: "PRV-001", name: "AutoParts Colombia", contact: "Laura Gómez", phone: "300 111 2233", email: "ventas@autoparts.co" },
-    { id: "PRV-002", name: "Frenos & Más", contact: "Jorge Díaz", phone: "301 555 8899", email: "contacto@frenosymas.com" },
-  ]);
-
-  const [parts, setParts] = React.useState<Part[]>([
-    { id: "SKU-1001", name: "Pastillas de freno Delanteras", sku: "PF-DEL-001", stock: 18, minStock: 6, price: 95000, providerId: "PRV-002" },
-    { id: "SKU-2002", name: "Aceite 10W40 4L", sku: "ACE-10W40", stock: 32, minStock: 10, price: 78000, providerId: "PRV-001" },
-    { id: "SKU-3003", name: "Filtro de aire", sku: "FIL-AIR-01", stock: 7, minStock: 8, price: 42000, providerId: "PRV-001" },
-  ]);
 
   const [reportKind, setReportKind] = React.useState<"citas" | "mecanicos" | "inventario" | "financiero" | null>(null);
 
@@ -292,6 +275,19 @@ export default function AdminGateway() {
           parts={supplies} setParts={setSupplies} suppliers={suppliers} createSupply={createSupply} updateSupply={updateSupply} removeSupply={removeSupply} />
         <ReportsDialog open={openReports} onClose={() => setOpenReports(false)} kind={reportKind} appointments={appointments} services={services} supplies={supplies} suppliers={suppliers} />
       </Box>
+      <Backdrop
+        sx={{
+          zIndex: 1400
+        }}
+        open={isLoading}
+        onClick={() => setLoading(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
+        <Alert severity={snack.sev} sx={{ width: "100%" }}>{snack.message}</Alert>
+      </Snackbar>
     </ThemeProvider>
+
   );
 }

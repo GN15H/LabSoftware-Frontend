@@ -10,6 +10,10 @@ import {
   Button,
   Paper,
   Stack,
+  Backdrop,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { client } from "./mock/mockData";
@@ -17,7 +21,6 @@ import { MechanicAppointment } from "./components/MechanicAppointments";
 import { useMechanicGateway } from "./MechanicGateway.hook";
 import { UploadPhotosDialog } from "./dialogs/UploadPhotosDialog";
 import { RegisterService } from "./dialogs/RegisterService";
-import { MechanicSidebar } from "./components/Sidebar";
 
 // Paleta y estilos del mock original
 export const PALETA = {
@@ -42,13 +45,15 @@ export const PALETA = {
 export default function MechanicPortalMUI() {
 
   const {
+    snack, setSnack,
+    isLoading, setLoading,
     appointments,
     supplies,
     selectedAppointment, setSelectedAppointment,
     procedureData, setProcedureData,
     serviceDialogOpen, setServiceDialogOpen,
     photoDialogOpen, setPhotoDialogOpen,
-    photoStage,
+    // photoStage,
     photos,
     fileInputRef,
     evidenceData, setEvidenceData,
@@ -56,12 +61,12 @@ export default function MechanicPortalMUI() {
     createProcedures,
     createEvidence,
     createAppointmentSupplies,
-    handleBudgetResponse,
+    // handleBudgetResponse,
     openPhotoModal,
     onChoosePhotos,
     savePhotos,
     saveService,
-    startService,
+    // startService,
     logout
   } = useMechanicGateway();
 
@@ -118,6 +123,18 @@ export default function MechanicPortalMUI() {
       {/* Dialog: Registrar Servicio */}
       <RegisterService createAppointmentSupplies={createAppointmentSupplies} appointment={selectedAppointment} createProcedures={createProcedures} procedureData={procedureData} setProcedureData={setProcedureData} supplies={supplies} serviceDialogOpen={serviceDialogOpen} setServiceDialogOpen={setServiceDialogOpen} saveService={saveService} />
 
+      <Backdrop
+        sx={{
+          zIndex: 1400
+        }}
+        open={isLoading}
+        onClick={() => setLoading(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
+        <Alert severity={snack.sev} sx={{ width: "100%" }}>{snack.message}</Alert>
+      </Snackbar>
       {/* Keyframes for pulse */}
       <style jsx global>{`
         @keyframes pulse {

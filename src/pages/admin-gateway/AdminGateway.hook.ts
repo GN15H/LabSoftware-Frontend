@@ -15,6 +15,10 @@ export function useAdminGateway() {
 
   const router = useRouter();
   const controller = new AdminGatewayController();
+
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [snack, setSnack] = useState<{ open: boolean; message: string; sev: "success" | "info" | "warning" | "error" }>({ open: false, message: "", sev: "info" });
+
   const [supplies, setSupplies] = useState<Supply[]>([])
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -23,13 +27,19 @@ export function useAdminGateway() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const createService = async (name: string, price: bigint) => {
+    setLoading(true);
     const createdService: Service | null = await controller.createService(name, price);
     if (createdService != null) {
       setServices(prev => [...prev, createdService]);
+      setSnack({ open: true, sev: "success", message: "Servicio creado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "success", message: "No se pudeo crear el servicio" });
     }
+    setLoading(false);
   }
 
   const updateService = async (id: number, name: string, price: bigint) => {
+    setLoading(true);
     const createdService: Service | null = await controller.updateService(id, name, price);
     if (createdService != null) {
       setServices(prev => {
@@ -40,10 +50,15 @@ export function useAdminGateway() {
         newArr[toBeUpdatedServiceIndex] = createdService;
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Servicio actualizado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo actualizar el servicio" });
     }
+    setLoading(false);
   }
 
   const removeService = async (id: number) => {
+    setLoading(true);
     const deleted: boolean = await controller.removeService(id);
     if (deleted) {
       setServices(prev => {
@@ -54,18 +69,28 @@ export function useAdminGateway() {
         newArr.splice(toBeDeletedServiceIndex, 1);
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Servicio eliminado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo eliminar el servicio" });
     }
+    setLoading(false);
   }
 
   const createSupply = async (data: SupplyData) => {
+    setLoading(true);
     const createdSupply: Supply | null = await controller.createSupply(data);
     if (createdSupply != null) {
       setSupplies(prev => [...prev, createdSupply]);
+      setSnack({ open: true, sev: "success", message: "Repuesto creado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo crear el repuesto" });
     }
+
+    setLoading(false);
   }
 
   const updateSupply = async (id: number, data: SupplyData) => {
-    console.log('huh');
+    setLoading(true);
     const updatedSupply: Supply | null = await controller.updateSupply(id, data);
     console.log('huhmas');
     if (updatedSupply != null) {
@@ -77,10 +102,15 @@ export function useAdminGateway() {
         newArr[toBeUpdatedSupplyIndex] = updatedSupply;
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Repuesto actualizado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo actualizar el repuesto" });
     }
+    setLoading(false);
   }
 
   const removeSupply = async (id: number) => {
+    setLoading(true);
     const deleted: boolean = await controller.removeSupply(id);
     if (deleted) {
       setSupplies(toBeDeletedSupply => {
@@ -91,17 +121,28 @@ export function useAdminGateway() {
         newArr.splice(toBeDeletedSupplyIndex, 1);
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Repuesto eliminado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo eliminar el repuesto" });
     }
+
+    setLoading(false);
   }
 
   const createSupplier = async (data: SupplierData) => {
+    setLoading(true);
     const createdSupplier: Supplier | null = await controller.createSupplier(data);
     if (createdSupplier != null) {
       setSuppliers(prev => [...prev, createdSupplier]);
+      setSnack({ open: true, sev: "success", message: "Proveedor creado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo crear el Proveedor" });
     }
+    setLoading(false);
   }
 
   const updateSupplier = async (id: number, data: SupplierData) => {
+    setLoading(true);
     const updatedSupplier: Supplier | null = await controller.updateSupplier(id, data);
     if (updatedSupplier != null) {
       setSuppliers(prev => {
@@ -112,10 +153,15 @@ export function useAdminGateway() {
         newArr[toBeUpdatedSupplierIndex] = updatedSupplier;
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Proveedor actualizado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo actualizar el proveedor" });
     }
+    setLoading(false);
   }
 
   const removeSupplier = async (id: number) => {
+    setLoading(true);
     const deleted: boolean = await controller.removeSupplier(id);
     if (deleted) {
       setSuppliers(toBeDeletedSupply => {
@@ -126,17 +172,24 @@ export function useAdminGateway() {
         newArr.splice(toBeDeletedSupplierIndex, 1);
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Proveedor eliminado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo eliminar el proveedor" });
     }
+    setLoading(false);
   }
 
   const createAppointment = async (data: AppointmentData) => {
+    setLoading(true);
     const createdAppointment: Appointment | null = await controller.createAppointment(data);
     if (createdAppointment != null) {
       window.location.reload();
     }
+    setLoading(false);
   }
 
   const updateAppointment = async (id: number, date: string, hour: string) => {
+    setLoading(true);
     const updated: boolean = await controller.reassignAppointment(id, date, hour);
     if (updated) {
       setAppointments(prev => {
@@ -147,10 +200,15 @@ export function useAdminGateway() {
         newArr[toBeUpdatedAppointmentIndex].date = new Date(date + "T" + hour + ":00.000Z")
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Cita reasignada correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo reasignar la cita" });
     }
+    setLoading(false);
   }
 
   const cancelAppointment = async (id: number) => {
+    setLoading(true);
     const cancelled: boolean = await controller.cancelAppointment(id);
     if (cancelled) {
       setAppointments(prev => {
@@ -161,17 +219,27 @@ export function useAdminGateway() {
         newArr.splice(toBeDeletedAppointmentIndex, 1);
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Cita cancelada correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo cancelar la cita" });
     }
+    setLoading(false);
   }
 
   const createUser = async (data: UserData) => {
+    setLoading(true);
     const createdUser: User | null = await controller.createUser(data);
     if (createdUser != null) {
       setUsers(prev => [...prev, createdUser]);
+      setSnack({ open: true, sev: "success", message: "Usuario creado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo crear el usuario" });
     }
+    setLoading(false);
   }
 
   const removeUser = async (id: number) => {
+    setLoading(true);
     const deleted: boolean = await controller.removeUser(id);
     if (deleted) {
       setUsers(prev => {
@@ -182,7 +250,11 @@ export function useAdminGateway() {
         newArr.splice(toBeDeletedUserIndex, 1);
         return newArr;
       });
+      setSnack({ open: true, sev: "success", message: "Usuario eliminado correctamente" });
+    } else {
+      setSnack({ open: true, sev: "error", message: "No se pudo eliminar el usuario" });
     }
+    setLoading(false);
   }
   useEffect(() => {
     const profileUnserialized = localStorage.getItem('profile')
@@ -196,6 +268,7 @@ export function useAdminGateway() {
     else if (profile['userType'] == 'mechanic')
       router.replace('/mecanico');
     const fetchData = async () => {
+      setLoading(true);
       const data = await controller.fetchData();
       setSupplies(data.supplies);
       setSuppliers(data.suppliers);
@@ -203,11 +276,14 @@ export function useAdminGateway() {
       setUsers(data.users);
       setVehicles(data.vehicles);
       setAppointments(data.appointments);
+      setLoading(false);
     }
     fetchData();
   }, [])
 
   return {
+    snack, setSnack,
+    isLoading, setLoading,
     services, setServices,
     supplies, setSupplies,
     suppliers, setSuppliers,

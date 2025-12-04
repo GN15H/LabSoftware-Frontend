@@ -19,6 +19,9 @@ export function useMechanicGateway() {
     6: { key: "entregado", label: "Entregado" },
   };
 
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [snack, setSnack] = useState<{ open: boolean; message: string; sev: "success" | "info" | "warning" | "error" }>({ open: false, message: "", sev: "info" });
+
   const [procedureData, setProcedureData] = useState<ProcedureData>({
     description: '',
     supplies: []
@@ -58,6 +61,7 @@ export function useMechanicGateway() {
       router.replace('/cliente');
 
     const fetchData = async () => {
+      setLoading(true);
       const data = await controller.fetchData();
       setAppointments(data.appointments);
       setSupplies(data.supplies);
@@ -66,6 +70,7 @@ export function useMechanicGateway() {
       // setServices(data.services);
       // console.log(data.appointments);
       // console.log("los servis", data.services);
+      setLoading(false);
     };
     console.log("tamo eperando");
     // console.log("y entonce eto ke e pue dedel huj", setSelectedAppointment);
@@ -74,30 +79,37 @@ export function useMechanicGateway() {
 
   // ---- Handlers del workflow ----
   const advanceWorkflowState = async (appointmentId: number, state: AppointmentStateType) => {
+    setLoading(true);
     const success = await controller.changeAppointmentState(appointmentId, state);
     if (success)
       window.location.reload();
     else
       alert("No se pudo hacer la solicitud");
+    setLoading(false);
   };
 
   const createProcedures = async (appointmentId: number, data: ProcedureData) => {
+    setLoading(true);
     const success = await controller.createProcedure(appointmentId, data);
     if (success)
       alert("Datos guardados");
     else
       alert("Los datos no se pudieron guardadr")
+    setLoading(false);
   }
 
   const createAppointmentSupplies = async (appointmentId: number, supplies: AppointmentSupplies[]) => {
+    setLoading(true);
     const success = await controller.createAppointmentSupplies(appointmentId, supplies);
     if (success)
       alert("Datos guardados");
     else
       alert("Los datos no se pudieron guardadr")
+    setLoading(false);
   }
 
   const createEvidence = async (appointmentId: number, evidenceData: EvidenceData) => {
+    setLoading(true);
     const success = await controller.createAppointmentEvidence(appointmentId, evidenceData);
     if (success) {
       alert("Datos guardados");
@@ -106,6 +118,7 @@ export function useMechanicGateway() {
       alert("Los datos no se pudieron guardadr")
       setPhotoDialogOpen(false);
     }
+    setLoading(false);
   }
 
   const handleBudgetResponse = (approved: boolean) => {
@@ -169,6 +182,8 @@ export function useMechanicGateway() {
   };
 
   return {
+    snack, setSnack,
+    isLoading, setLoading,
     appointments,
     supplies,
     selectedAppointment, setSelectedAppointment,

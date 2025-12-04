@@ -1,7 +1,5 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   AppBar,
   Toolbar,
@@ -12,32 +10,18 @@ import {
   Button,
   Paper,
   Stack,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Snackbar,
   Alert,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid"; // Grid v2
-import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import CloseIcon from "@mui/icons-material/Close";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
+// import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Appointments } from "./components/Appointments";
-import { appointments, appointmentsStory, vehicle } from "./mock/mockData";
 import { Vehicles } from "./components/Vehicles";
 import { useClientGateway } from "./ClientGateway.hook";
 import { AppointmentsStory } from "./components/AppointmentsStory";
 import { RegisterVehicle } from "./dialogs/RegisterVehicle";
-import { VehicleData } from "./ClientGateway.types";
 import { BookAppointment } from "./dialogs/BookAppointment";
 import { PaymentGateway } from "./dialogs/PaymentGateway";
 import { ReassignAppointment } from "./dialogs/ReassignAppointment";
@@ -62,16 +46,15 @@ const PALETA = {
   texto: "#2c3e50",
 };
 
-// ------- Tipos simples -------
-type CitaStatus = "pending" | "in-progress" | "completed" | "cancelled";
 
 export default function ClientGateway() {
 
   const {
+    isLoading, setLoading,
     snack, setSnack,
-    appointments, setAppointments,
-    vehicles, setVehicles,
-    services, setServices,
+    appointments,
+    vehicles,
+    services,
     vehicleOpen, setVehicleOpen,
     apptOpen, setApptOpen,
     reasignOpen, setReasignOpen,
@@ -79,13 +62,13 @@ export default function ClientGateway() {
     paymentOpen, setPaymentOpen,
     budgetApprovedOpen, setBudgetApprovedOpen,
     budgetRejectedOpen, setBudgetRejectedOpen,
-    chatOpen, setChatOpen,
+    // chatOpen, setChatOpen,
     vehicleData, setVehicleData,
     apptData, setApptData,
     reassignData, setReassignData,
     paymentData, setPaymentData,
-    chatMsgs, setChatMsgs,
-    chatInput, setChatInput,
+    // chatMsgs, setChatMsgs,
+    // chatInput, setChatInput,
     selectedAppointment, setSelectedAppointment,
     logout,
     submitVehicle,
@@ -96,7 +79,7 @@ export default function ClientGateway() {
     processPayment,
     showApproveBudget,
     showRejectBudget,
-    sendChat
+    // sendChat
   } = useClientGateway();
 
   // Badges de estado
@@ -172,9 +155,9 @@ export default function ClientGateway() {
       </Container>
 
       {/* Floating Chat Button */}
-      <Box onClick={() => setChatOpen(true)} sx={{ position: "fixed", bottom: 30, right: 30, width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #3498db 0%, #2980b9 100%)", boxShadow: "0 4px 20px rgba(52, 152, 219, 0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 26, zIndex: 1000, transition: "transform .2s, box-shadow .2s", "&:hover": { transform: "scale(1.1)", boxShadow: "0 6px 25px rgba(52, 152, 219, 0.6)" } }}>
-        <ChatBubbleOutlineIcon />
-      </Box>
+      {/* <Box onClick={() => setChatOpen(true)} sx={{ position: "fixed", bottom: 30, right: 30, width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #3498db 0%, #2980b9 100%)", boxShadow: "0 4px 20px rgba(52, 152, 219, 0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 26, zIndex: 1000, transition: "transform .2s, box-shadow .2s", "&:hover": { transform: "scale(1.1)", boxShadow: "0 6px 25px rgba(52, 152, 219, 0.6)" } }}> */}
+      {/*   <ChatBubbleOutlineIcon /> */}
+      {/* </Box> */}
 
       {/* Chat Modal */}
 
@@ -198,6 +181,15 @@ export default function ClientGateway() {
       {/* Dialog: Presupuesto Rechazado */}
       <RejectBudget selectedAppointment={selectedAppointment} executeCancelAppointment={executeCancelAppointment} budgetRejectedOpen={budgetRejectedOpen} setBudgetRejectedOpen={setBudgetRejectedOpen} />
 
+      <Backdrop
+        sx={{
+          zIndex: 2000
+        }}
+        open={isLoading}
+        onClick={() => setLoading(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {/* Snackbar */}
       <Snackbar open={snack.open} autoHideDuration={4000} onClose={() => setSnack({ ...snack, open: false })}>
         <Alert severity={snack.sev} sx={{ width: "100%" }}>{snack.message}</Alert>

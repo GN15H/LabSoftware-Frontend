@@ -10,6 +10,7 @@ import { Service } from "@/domain/models/Service";
 export function useClientGateway() {
   const controller = new ClientGatewayController();
 
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [snack, setSnack] = useState<{ open: boolean; message: string; sev: "success" | "info" | "warning" | "error" }>({ open: false, message: "", sev: "info" });
 
   // Citas y vehículos de ejemplo (mock)
@@ -77,8 +78,10 @@ export function useClientGateway() {
 
   const submitVehicle = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     if (controller.validateVehicle(vehicleData) != null) return;
     const created = await controller.createVehicle(vehicleData)
+    setLoading(false);
     if (created) {
       window.location.reload();
       setVehicleOpen(false);
@@ -88,7 +91,9 @@ export function useClientGateway() {
 
   const submitAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     const created = await controller.createAppointment(apptData);
+    setLoading(false);
     if (created) {
       setSnack({ open: true, sev: "success", message: "Cita agendada con éxito" });
       setTimeout(() => window.location.reload(), 3000);
@@ -99,7 +104,9 @@ export function useClientGateway() {
   };
 
   const executeCancelAppointment = async (id: number) => {
+    setLoading(true);
     const deleted = await controller.cancelAppointment(id);
+    setLoading(false);
     if (deleted) {
       const newAppointments = [...appointments];
       const appt = newAppointments.findIndex(a => a.id == id);
@@ -113,7 +120,9 @@ export function useClientGateway() {
   };
 
   const submitApproveBudget = async (id: number) => {
+    setLoading(true);
     const approved = await controller.approveBudget(id);
+    setLoading(false);
     if (approved) {
       setSnack({ open: true, sev: "success", message: "Presupuesto aprobado exitosamente" });
     } else {
@@ -126,6 +135,7 @@ export function useClientGateway() {
   const submitReasign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAppointment == null) return;
+    setLoading(true);
     const updated = await controller.reassignAppointment(reassignData, selectedAppointment.id);
     if (updated) {
       const newAppointments = [...appointments];
@@ -136,11 +146,14 @@ export function useClientGateway() {
     } else {
       setSnack({ open: true, sev: "error", message: "No se pudo reasignar la cita" });
     }
+    setLoading(false);
     setReasignOpen(false);
   };
 
   const processPayment = async (appointment: Appointment) => {
+    setLoading(true);
     const created = await controller.createPayment(appointment, paymentData);
+    setLoading(false);
     if (created) {
       setSnack({ open: true, sev: "success", message: "¡Pago procesado exitosamente!" });
     } else {
@@ -184,12 +197,12 @@ export function useClientGateway() {
       router.replace('/mecanico');
 
     const fetchData = async () => {
+      setLoading(true);
       const data = await controller.fetchData();
       setVehicles(data.vehicles);
       setAppointments(data.appointments);
       setServices(data.services);
-      console.log(data.appointments);
-      console.log("los servis", data.services);
+      setLoading(false);
     };
     console.log("tamo eperando");
     console.log("y entonce eto ke e pue dedel huj", setSelectedAppointment);
@@ -197,6 +210,7 @@ export function useClientGateway() {
   }, []);
 
   return {
+    isLoading, setLoading,
     snack, setSnack,
     appointments, setAppointments,
     vehicles, setVehicles,
