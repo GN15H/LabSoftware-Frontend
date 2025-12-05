@@ -84,6 +84,9 @@ export function useRegisterPage() {
     if (!created) {
       showMessage('Hubo un error inesperado, intentalo mas tarde', 'error');
       return;
+    } else {
+      showMessage('Cuenta creada exitosamente', 'success');
+      setTimeout(() => { }, 2000);
     }
     setLoading(false);
     setStage(2);

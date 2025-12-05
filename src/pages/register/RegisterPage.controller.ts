@@ -28,13 +28,14 @@ export class RegisterPageController {
   private async register(data: RegisterPageData): Promise<boolean> {
     // const response = await axios.get('http://127.0.0.1:3000/users');
     try {
-      const response = await axios.post('http://127.0.0.1:3000/users', {
+      const response = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URI + 'users', {
         dni: data.documentNumber,
         name: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        birthDate: data.birthDate + 'T00:00:00.000Z'
+        birthDate: data.birthDate + 'T00:00:00.000Z',
+        userType: 3
       });
       if (response.status != 201) return false;
       return true;

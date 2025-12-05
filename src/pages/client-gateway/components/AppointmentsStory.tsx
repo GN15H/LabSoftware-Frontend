@@ -40,6 +40,11 @@ export const AppointmentsStory = ({ appointments }: AppointmentsStoryProps) => {
       headStyles: { fillColor: [41, 128, 185] },
     });
 
+    autoTable(doc, {
+      head: [["Evidencias"]],
+      body: app.evidences.map(e => [e.filePath])
+    })
+
     if (extraFooter) {
       const finalY = (doc as any).lastAutoTable.finalY + 20;
       doc.setFontSize(11);

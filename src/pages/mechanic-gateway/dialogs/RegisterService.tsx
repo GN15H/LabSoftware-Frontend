@@ -79,7 +79,7 @@ export const RegisterService = ({ createAppointmentSupplies, appointment, suppli
 
   const handleSave = () => {
     console.log(procedureData);
-    createProcedures(appointment, procedureData);
+    // createProcedures(appointment, procedureData);
     createAppointmentSupplies(appointment, procedureData.supplies)
     // saveService(supplyItems);
     // setSupplyItems([{ supplyId: '', quantity: 1 }]);

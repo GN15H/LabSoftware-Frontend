@@ -1,5 +1,5 @@
 import { Bay } from "./Bay";
-import { Evidence } from "./Evidence";
+import { Evidence, IEvidenceMap } from "./Evidence";
 import { IPaymentMap, Payment } from "./Payment";
 import { IServiceMap, Service } from "./Service";
 import { Supply } from "./Supply";
@@ -17,6 +17,7 @@ export interface IAppointmentMap {
   Vehicles: IVehicleMap;
   Users: IUserMap;
   Payments: IPaymentMap[];
+  Evidences: IEvidenceMap[];
   Appointment_Services: { Services: IServiceMap }[];
 }
 
@@ -58,7 +59,7 @@ export class Appointment {
     this.payment = payment;
   }
 
-  static fromMap({ id, Users, appointment_date, mechanic_id, bay_id, appointment_state_id, vehicle_id, Vehicles, Payments, Appointment_Services }: IAppointmentMap): Appointment {
+  static fromMap({ id, Users, appointment_date, appointment_state_id, Vehicles, Payments, Appointment_Services, Evidences }: IAppointmentMap): Appointment {
     let payment: Payment | null = null;
     if (Payments.length > 0) {
       payment = Payment.fromMap(Payments[0])
@@ -71,7 +72,7 @@ export class Appointment {
       appointmentState: appointmentStateFromId(appointment_state_id),
       vehicle: Vehicle.fromMap(Vehicles),
       supplies: [],
-      evidences: [],
+      evidences: Evidences.map(e => Evidence.fromMap(e)),
       services: Appointment_Services.map(s => Service.fromMap(s.Services)),
       payment: payment
     })

@@ -1,5 +1,10 @@
 import { EvidenceType } from "./types";
 
+export interface IEvidenceMap {
+  id: number;
+  file_path: string;
+}
+
 interface IEvidence {
   id: number;
   description: string;
@@ -19,4 +24,14 @@ export class Evidence {
     this.filePath = filePath;
     this.evidenceType = evidenceType;
   }
+
+  static fromMap({ id, file_path }: IEvidenceMap): Evidence {
+    return new Evidence({
+      id: id,
+      description: "",
+      filePath: file_path,
+      evidenceType: 'photo'
+    })
+  }
 }
+
