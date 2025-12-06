@@ -16,11 +16,10 @@ import {
   Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { client } from "./mock/mockData";
-import { MechanicAppointment } from "./components/MechanicAppointments";
-import { useMechanicGateway } from "./MechanicGateway.hook";
-import { UploadPhotosDialog } from "./dialogs/UploadPhotosDialog";
-import { RegisterService } from "./dialogs/RegisterService";
+import { useMechanicGateway } from "@/hooks/MechanicGateway.hook";
+import { MechanicAppointment } from "@/components/mechanic-gateway/components/MechanicAppointments";
+import { UploadPhotosDialog } from "@/components/mechanic-gateway/dialogs/UploadPhotosDialog";
+import { RegisterService } from "@/components/mechanic-gateway/dialogs/RegisterService";
 
 // Paleta y estilos del mock original
 export const PALETA = {
@@ -105,7 +104,7 @@ export default function MechanicPortalMUI() {
               <Box sx={{ p: 2.5 }}>
                 {
                   appointments.map(a => (
-                    <MechanicAppointment setSelectedAppointment={setSelectedAppointment} advanceWorkflow={advanceWorkflowState} setServiceDialogOpen={setServiceDialogOpen} openPhotoModal={openPhotoModal} key={a.id} appointment={a} client={client} />
+                    <MechanicAppointment setSelectedAppointment={setSelectedAppointment} advanceWorkflow={advanceWorkflowState} setServiceDialogOpen={setServiceDialogOpen} openPhotoModal={openPhotoModal} key={a.id} appointment={a} />
                   ))
                 }
               </Box>

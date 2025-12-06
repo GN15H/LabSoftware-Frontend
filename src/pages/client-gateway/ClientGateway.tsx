@@ -17,19 +17,19 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid"; // Grid v2
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import { Appointments } from "./components/Appointments";
-import { Vehicles } from "./components/Vehicles";
-import { useClientGateway } from "./ClientGateway.hook";
-import { AppointmentsStory } from "./components/AppointmentsStory";
-import { RegisterVehicle } from "./dialogs/RegisterVehicle";
-import { BookAppointment } from "./dialogs/BookAppointment";
-import { PaymentGateway } from "./dialogs/PaymentGateway";
-import { ReassignAppointment } from "./dialogs/ReassignAppointment";
-import { ApproveBudget } from "./dialogs/ApproveBudget";
-import { RejectBudget } from "./dialogs/RejectBudget";
-import { CancelAppointment } from "./dialogs/CancelAppointment";
-import { AppointmentsPayments } from "./components/AppointmentsPayment";
-import { PendingOrders } from "./components/PendingOrders";
+import { useClientGateway } from "@/hooks/ClientGateway.hook";
+import { Appointments } from "@/components/client-gateway/components/Appointments";
+import { Vehicles } from "@/components/client-gateway/components/Vehicles";
+import { AppointmentsStory } from "@/components/client-gateway/components/AppointmentsStory";
+import { AppointmentsPayments } from "@/components/client-gateway/components/AppointmentsPayment";
+import { PendingOrders } from "@/components/client-gateway/components/PendingOrders";
+import { RegisterVehicle } from "@/components/client-gateway/dialogs/RegisterVehicle";
+import { BookAppointment } from "@/components/client-gateway/dialogs/BookAppointment";
+import { PaymentGateway } from "@/components/client-gateway/dialogs/PaymentGateway";
+import { ReassignAppointment } from "@/components/client-gateway/dialogs/ReassignAppointment";
+import { ApproveBudget } from "@/components/client-gateway/dialogs/ApproveBudget";
+import { RejectBudget } from "@/components/client-gateway/dialogs/RejectBudget";
+import { CancelAppointment } from "@/components/client-gateway/dialogs/CancelAppointment";
 
 const PALETA = {
   fondo: "#f8f9fa",

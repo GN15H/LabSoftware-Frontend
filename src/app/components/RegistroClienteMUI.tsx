@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Paper,
@@ -17,18 +16,11 @@ import {
   MenuItem,
   Divider,
   Avatar,
+  SelectChangeEvent,
 } from '@mui/material';
 import Grid from '@mui/material/Grid'; // Grid v2 (sin item/xs/md) -> usar size={{ }}
 import CheckIcon from '@mui/icons-material/Check';
-import { useRouter } from 'next/navigation';
-
-type Severidad = 'success' | 'info' | 'warning' | 'error';
-
-type Errores = Partial<Record<
-  'firstName' | 'lastName' | 'documentType' | 'documentNumber' | 'birthDate' |
-  'email' | 'phone' | 'address' | 'password' | 'confirmPassword' | 'termsAccepted',
-  string
->>;
+import { useRegisterPage } from '@/hooks/RegisterPage.hook';
 
 const PALETA = {
   fondo: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -40,149 +32,21 @@ const PALETA = {
   grisBorde: '#ecf0f1',
 };
 
-export default function RegistroClienteMUI() {
-  // ----------------------- estado del formulario -----------------------
-  const [datos, setDatos] = useState({
-    firstName: '',
-    lastName: '',
-    documentType: '',
-    documentNumber: '',
-    birthDate: '',
-    email: '',
-    phone: '',
-    address: '',
-    password: '',
-    confirmPassword: '',
-    termsAccepted: false,
-    marketingEmails: false,
-  });
+export default function RegisterPage() {
 
-  const [errores, setErrores] = useState<Errores>({});
-  const [snack, setSnack] = useState<{ open: boolean; severity: Severidad; message: string }>({
-    open: false, severity: 'info', message: ''
-  });
-  const [cargando, setCargando] = useState(false);
-  const [paso, setPaso] = useState(0); // 0 activo, luego 1, luego 2 (completado)
+  const {
+    snack, setSnack,
+    loading, //setLoading,
+    stage,
+    data,
+    errors,
+    goToLogin,
+    handleFieldChange,
+    handleSubmit,
+    showTerms,
+    showPrivacy
+  } = useRegisterPage();
 
-  const emailRegex = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/, []);
-  const phoneDigits = (v: string) => v.replace(/\D/g, '');
-  const router = useRouter();
-
-  function validarCampo(nombre: keyof typeof datos, valor: string | boolean): boolean {
-    let msg = '';
-
-    switch (nombre) {
-      case 'firstName':
-      case 'lastName':
-        if (!valor) msg = 'Este campo es obligatorio';
-        else if ((valor as string).length < 2) msg = 'Debe tener al menos 2 caracteres';
-        break;
-
-      case 'documentType':
-        if (!valor) msg = 'Selecciona un tipo de documento';
-        break;
-
-      case 'documentNumber':
-        if (!valor) msg = 'Este campo es obligatorio';
-        else if (!/^\d{6,12}$/.test(String(valor))) msg = 'Debe contener entre 6 y 12 números';
-        break;
-
-      case 'email':
-        if (!valor) msg = 'Este campo es obligatorio';
-        else if (!emailRegex.test(String(valor))) msg = 'Ingresa un correo electrónico válido';
-        break;
-
-      case 'phone': {
-        const d = phoneDigits(String(valor));
-        if (!d) msg = 'Este campo es obligatorio';
-        else if (!/^\d{7,10}$/.test(d)) msg = 'Ingresa un número válido (7-10 dígitos)';
-        break;
-      }
-
-      case 'password':
-        if (!valor) msg = 'Este campo es obligatorio';
-        else if (String(valor).length < 8) msg = 'La contraseña debe tener al menos 8 caracteres';
-        break;
-
-      case 'confirmPassword':
-        if (!valor) msg = 'Confirma tu contraseña';
-        else if (String(valor) !== datos.password) msg = 'Las contraseñas no coinciden';
-        break;
-
-      case 'termsAccepted':
-        if (!valor) msg = 'Debes aceptar los términos y condiciones para continuar';
-        break;
-    }
-
-    setErrores(prev => ({ ...prev, [nombre]: msg || undefined }));
-    return !msg;
-  }
-
-  // Revalidación suave cuando el usuario corrige
-  useEffect(() => {
-    (['firstName','lastName','documentType','documentNumber','email','phone','password','confirmPassword'] as const)
-      .forEach((k) => { if (errores[k]) validarCampo(k, datos[k]); });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datos.firstName, datos.lastName, datos.documentType, datos.documentNumber, datos.email, datos.phone, datos.password, datos.confirmPassword]);
-
-  // ----------------------- handlers -----------------------
-  const onChangeTexto = (k: keyof typeof datos) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDatos(d => ({ ...d, [k]: e.target.value }));
-  };
-
-  const onChangeSelect = (k: keyof typeof datos) => (e: any) => {
-    setDatos(d => ({ ...d, [k]: e.target.value }));
-  };
-
-  const onChangeCheck = (k: keyof typeof datos) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDatos(d => ({ ...d, [k]: e.target.checked }));
-    if (k === 'termsAccepted') validarCampo('termsAccepted', e.target.checked);
-  };
-
-  function mostrarMensaje(m: string, sev: Severidad = 'error') {
-    setSnack({ open: true, severity: sev, message: m });
-  }
-
-  function actualizarProgreso(n: 0 | 1 | 2) {
-    setPaso(n);
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // validar todos los obligatorios + términos
-    const camposOblig = [
-      'firstName','lastName','documentType','documentNumber',
-      'email','phone','password','confirmPassword'
-    ] as const;
-
-    let ok = true;
-    for (const k of camposOblig) {
-      if (!validarCampo(k, datos[k])) ok = false;
-    }
-    if (!validarCampo('termsAccepted', datos.termsAccepted)) ok = false;
-
-    if (!ok) {
-      mostrarMensaje('Por favor corrige los errores señalados en el formulario', 'error');
-      return;
-    }
-
-    setCargando(true);
-    // Simula API
-    setTimeout(() => {
-      mostrarMensaje('¡Cuenta creada exitosamente! Bienvenido a AutoLink Manager', 'success');
-      actualizarProgreso(2);
-
-      setTimeout(() => {
-        alert('Registro completado. Redirigiendo al portal del cliente...');
-        setCargando(false);
-      }, 2000);
-    }, 2000);
-  };
-
-  const abrirTerminos = () => alert('Aquí se mostrarían los términos y condiciones completos');
-  const abrirPrivacidad = () => alert('Aquí se mostraría la política de privacidad completa');
-  const irLogin = () => router.push('/');
 
   // ----------------------- UI -----------------------
   const PasoDot = ({ estado }: { estado: 'idle' | 'active' | 'done' }) => (
@@ -191,7 +55,7 @@ export default function RegistroClienteMUI() {
         width: 8, height: 8, borderRadius: '50%',
         backgroundColor:
           estado === 'done' ? PALETA.verde :
-          estado === 'active' ? PALETA.acento : '#ecf0f1'
+            estado === 'active' ? PALETA.acento : '#ecf0f1'
       }}
     />
   );
@@ -284,9 +148,9 @@ export default function RegistroClienteMUI() {
 
             {/* Indicador de progreso */}
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: .6, mb: 2 }}>
-              <PasoDot estado={paso > 0 ? 'done' : 'active'} />
-              <PasoDot estado={paso > 1 ? 'done' : (paso === 1 ? 'active' : 'idle')} />
-              <PasoDot estado={paso === 2 ? 'done' : 'idle'} />
+              <PasoDot estado={stage > 0 ? 'done' : 'active'} />
+              <PasoDot estado={stage > 1 ? 'done' : (stage === 1 ? 'active' : 'idle')} />
+              <PasoDot estado={stage === 2 ? 'done' : 'idle'} />
             </Box>
 
             {/* Mensajes (Snackbar) */}
@@ -306,11 +170,11 @@ export default function RegistroClienteMUI() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     label="Nombre*"
-                    value={datos.firstName}
-                    onChange={onChangeTexto('firstName')}
-                    onBlur={() => validarCampo('firstName', datos.firstName)}
-                    error={!!errores.firstName}
-                    helperText={errores.firstName || ' '}
+                    value={data.firstName}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('firstName', event.target.value)}
+                    // onBlur={() => validarCampo('firstName', datos.firstName)}
+                    error={errors.firstName != null}
+                    helperText={errors.firstName || ' '}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -319,11 +183,11 @@ export default function RegistroClienteMUI() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     label="Apellido*"
-                    value={datos.lastName}
-                    onChange={onChangeTexto('lastName')}
-                    onBlur={() => validarCampo('lastName', datos.lastName)}
-                    error={!!errores.lastName}
-                    helperText={errores.lastName || ' '}
+                    value={data.lastName}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('lastName', event.target.value)}
+                    // onBlur={() => validarCampo('lastName', data.lastName)}
+                    error={errors.lastName != null}
+                    helperText={errors.lastName || ' '}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -338,28 +202,28 @@ export default function RegistroClienteMUI() {
                     <InputLabel>Tipo de Documento*</InputLabel>
                     <Select
                       label="Tipo de Documento*"
-                      value={datos.documentType}
-                      onChange={onChangeSelect('documentType')}
-                      onBlur={() => validarCampo('documentType', datos.documentType)}
-                      error={!!errores.documentType}
+                      value={data.documentType}
+                      onChange={(event: SelectChangeEvent) => handleFieldChange('documentType', event.target.value as string)}
+                      // onBlur={() => validarCampo('documentType', data.documentType)}
+                      error={!!errors.documentType}
                     >
                       <MenuItem value=""><em>Seleccionar…</em></MenuItem>
                       <MenuItem value="CC">Cédula de Ciudadanía</MenuItem>
                       <MenuItem value="CE">Cédula de Extranjería</MenuItem>
                       <MenuItem value="PA">Pasaporte</MenuItem>
                     </Select>
-                    <Typography variant="caption" color="error">{errores.documentType || ' '}</Typography>
+                    <Typography variant="caption" color="error">{errors.documentType || ' '}</Typography>
                   </FormControl>
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 4 }}>
                   <TextField
                     label="Número de Documento*"
-                    value={datos.documentNumber}
-                    onChange={onChangeTexto('documentNumber')}
-                    onBlur={() => validarCampo('documentNumber', datos.documentNumber)}
-                    error={!!errores.documentNumber}
-                    helperText={errores.documentNumber || 'Solo números'}
+                    value={data.documentNumber}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('documentNumber', event.target.value)}
+                    // onBlur={() => validarCampo('documentNumber', data.documentNumber)}
+                    error={!!errors.documentNumber}
+                    helperText={errors.documentNumber || 'Solo números'}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -370,10 +234,11 @@ export default function RegistroClienteMUI() {
                   <TextField
                     label="Fecha de Nacimiento"
                     type="date"
-                    value={datos.birthDate}
-                    onChange={onChangeTexto('birthDate')}
-                    InputLabelProps={{ shrink: true }}
+                    value={data.birthDate}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('birthDate', event.target.value)}
+                    // InputLabelProps={{ shrink: true }}
                     fullWidth
+                    slotProps={{ inputLabel: { shrink: true } }}
                     variant="outlined"
                     sx={fieldSx()}
                   />
@@ -383,11 +248,11 @@ export default function RegistroClienteMUI() {
               {/* Email (full width) */}
               <TextField
                 label="Correo Electrónico*"
-                value={datos.email}
-                onChange={onChangeTexto('email')}
-                onBlur={() => validarCampo('email', datos.email)}
-                error={!!errores.email}
-                helperText={errores.email || 'Recibirás notificaciones importantes aquí'}
+                value={data.email}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('email', event.target.value)}
+                // onBlur={() => validarCampo('email', data.email)}
+                error={!!errors.email}
+                helperText={errors.email || 'Recibirás notificaciones importantes aquí'}
                 fullWidth
                 variant="outlined"
                 sx={fieldSx()}
@@ -398,11 +263,11 @@ export default function RegistroClienteMUI() {
                 <Grid size={{ xs: 12, md: 6 }}>
                   <TextField
                     label="Teléfono*"
-                    value={datos.phone}
-                    onChange={onChangeTexto('phone')}
-                    onBlur={() => validarCampo('phone', datos.phone)}
-                    error={!!errores.phone}
-                    helperText={errores.phone || 'Incluye código de área'}
+                    value={data.phone}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('phone', event.target.value)}
+                    // onBlur={() => validarCampo('phone', data.phone)}
+                    error={!!errors.phone}
+                    helperText={errors.phone || 'Incluye código de área'}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -412,8 +277,8 @@ export default function RegistroClienteMUI() {
                   <TextField
                     label="Dirección"
                     placeholder="Calle, número, barrio"
-                    value={datos.address}
-                    onChange={onChangeTexto('address')}
+                    value={data.address}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('address', event.target.value)}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -427,11 +292,11 @@ export default function RegistroClienteMUI() {
                   <TextField
                     label="Contraseña*"
                     type="password"
-                    value={datos.password}
-                    onChange={onChangeTexto('password')}
-                    onBlur={() => validarCampo('password', datos.password)}
-                    error={!!errores.password}
-                    helperText={errores.password || 'Mínimo 8 caracteres'}
+                    value={data.password}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('password', event.target.value)}
+                    // onBlur={() => validarCampo('password', data.password)}
+                    error={!!errors.password}
+                    helperText={errors.password || 'Mínimo 8 caracteres'}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -441,11 +306,11 @@ export default function RegistroClienteMUI() {
                   <TextField
                     label="Confirmar Contraseña*"
                     type="password"
-                    value={datos.confirmPassword}
-                    onChange={onChangeTexto('confirmPassword')}
-                    onBlur={() => validarCampo('confirmPassword', datos.confirmPassword)}
-                    error={!!errores.confirmPassword}
-                    helperText={errores.confirmPassword || ' '}
+                    value={data.confirmPassword}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('confirmPassword', event.target.value)}
+                    // onBlur={() => validarCampo('confirmPassword', data.confirmPassword)}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword || ' '}
                     fullWidth
                     variant="outlined"
                     sx={fieldSx()}
@@ -456,26 +321,26 @@ export default function RegistroClienteMUI() {
               {/* Checkboxes */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 <FormControlLabel
-                  control={<Checkbox checked={datos.termsAccepted} onChange={onChangeCheck('termsAccepted')} />}
+                  control={<Checkbox checked={data.termsAccepted} onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('termsAccepted', event.target.checked)} />}
                   label={
                     <Typography sx={{ fontSize: '.9rem', color: '#2c3e50' }}>
                       Acepto los{' '}
-                      <Button onClick={abrirTerminos} sx={{ p: 0, minWidth: 0, textTransform: 'none', color: PALETA.acento }}>
+                      <Button onClick={showTerms} sx={{ p: 0, minWidth: 0, textTransform: 'none', color: PALETA.acento }}>
                         Términos y Condiciones
                       </Button>{' '}
                       y la{' '}
-                      <Button onClick={abrirPrivacidad} sx={{ p: 0, minWidth: 0, textTransform: 'none', color: PALETA.acento }}>
+                      <Button onClick={showPrivacy} sx={{ p: 0, minWidth: 0, textTransform: 'none', color: PALETA.acento }}>
                         Política de Privacidad
                       </Button>{' '}*
                     </Typography>
                   }
                 />
-                {!!errores.termsAccepted && (
-                  <Typography variant="caption" color="error">{errores.termsAccepted}</Typography>
+                {!data.termsAccepted && (
+                  <Typography variant="caption" color="error">{errors.termsAccepted}</Typography>
                 )}
 
                 <FormControlLabel
-                  control={<Checkbox checked={datos.marketingEmails} onChange={onChangeCheck('marketingEmails')} />}
+                  control={<Checkbox checked={data.marketingEmails} onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('marketingEmails', event.target.checked)} />}
                   label={<Typography sx={{ fontSize: '.9rem', color: '#2c3e50' }}>
                     Quiero recibir promociones y ofertas especiales por correo electrónico
                   </Typography>}
@@ -486,7 +351,7 @@ export default function RegistroClienteMUI() {
               <Button
                 type="submit"
                 variant="contained"
-                disabled={cargando}
+                disabled={loading}
                 sx={{
                   background: `linear-gradient(135deg, ${PALETA.acento} 0%, ${PALETA.acentoOscuro} 100%)`,
                   color: '#fff',
@@ -497,7 +362,7 @@ export default function RegistroClienteMUI() {
                   '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(52,152,219,0.16)' },
                 }}
               >
-                {cargando ? 'Creando cuenta...' : 'Crear Mi Cuenta'}
+                {loading ? 'Creando cuenta...' : 'Crear Mi Cuenta'}
               </Button>
 
               <Box sx={{ textAlign: 'center', mt: 1 }}>
@@ -510,7 +375,7 @@ export default function RegistroClienteMUI() {
 
               <Box sx={{ textAlign: 'center', color: PALETA.textoSuave }}>
                 ¿Ya tienes una cuenta?{' '}
-                <Button onClick={irLogin} sx={{ textTransform: 'none' }}>
+                <Button onClick={goToLogin} sx={{ textTransform: 'none' }}>
                   <Typography sx={{ color: PALETA.acento, fontWeight: 600 }}>Inicia sesión aquí</Typography>
                 </Button>
               </Box>
@@ -534,3 +399,4 @@ function fieldSx() {
     },
   } as const;
 }
+

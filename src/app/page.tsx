@@ -1,5 +1,6 @@
-import LoginMUI from '@/app/components/LoginMUI';
-import { LoginPage } from '@/pages/login/LoginPage';
+// import LoginPage from '@/app/components/LoginMUI';
+// import { LoginPage } from '@/pages/login/LoginPage';
+import LoginPage from '@/pages/login/LoginPage';
 import dotenv from 'dotenv';
 
 dotenv.config();

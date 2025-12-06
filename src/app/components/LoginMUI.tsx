@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -16,95 +15,20 @@ import {
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import Grid from '@mui/material/Grid';
-import router from 'next/router';
-import { useRouter } from 'next/navigation';
+import { useLoginPage } from '@/hooks/LoginPage.hook';
 
 
-export default function LoginMUI() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [loading, setLoading] = useState(false);
-  const [snack, setSnack] = useState<{ open: boolean; severity: 'success' | 'info' | 'warning' | 'error'; message: string }>({ open: false, severity: 'info', message: '' });
-  const router = useRouter();
-
-  useEffect(() => {
-    // Realtime validation behavior similar al original: blurs y input corrigen errores
-    if (errors.email && email) validateField('email', email);
-    if (errors.password && password) validateField('password', password);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, password]);
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  interface Errors {
-    email?: string;
-    password?: string;
-  }
-
-  type FieldName = 'email' | 'password';
-
-  function validateField(name: FieldName, value: string): boolean {
-    let msg = '';
-    if (name === 'email') {
-      if (!value) msg = 'El correo electrónico es obligatorio';
-      else if (!emailRegex.test(value)) msg = 'Ingresa un correo electrónico válido';
-    }
-    if (name === 'password') {
-      if (!value) msg = 'La contraseña es obligatoria';
-    }
-
-    setErrors((prev: Errors) => ({ ...prev, [name]: msg }));
-    return !msg;
-  }
-
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    const emailValid = validateField('email', email.trim().toLowerCase());
-    const passwordValid = validateField('password', password);
-    if (!emailValid || !passwordValid) {
-      setSnack({ open: true, severity: 'error', message: 'Por favor corrige los errores en el formulario' });
-      return;
-    }
-
-    setLoading(true);
-
-    // Simula llamada a API
-    setTimeout(() => {
-      const validUsers: { [key: string]: { name: string; type: string } } = {
-        'juan.perez@gmail.com': { name: 'Juan Pérez', type: 'cliente' },
-        'maria.garcia@hotmail.com': { name: 'María García', type: 'cliente' },
-        'carlos.rodriguez@autolink.com': { name: 'Carlos Rodríguez', type: 'mecanico' },
-        'ana.fernandez@autolink.com': { name: 'Ana Fernández', type: 'mecanico' },
-        'admin@autolink.com': { name: 'Administrador Principal', type: 'admin' },
-        'admin.sistemas@autolink.com': { name: 'Admin Sistemas', type: 'admin' },
-      };
-
-      const userData = validUsers[email.trim().toLowerCase()];
-
-      if (userData && password === '12345678') {
-        setSnack({ open: true, severity: 'success', message: `¡Bienvenido ${userData.name}!` });
-        setTimeout(() => {
-          if (userData.type === 'admin') router.push('/admin');
-          else if (userData.type === 'mecanico') router.push('/mecanico');
-          else router.push('/cliente');
-        }, 1200);
-
-      } else {
-        setSnack({ open: true, severity: 'error', message: 'Credenciales incorrectas. Verifica tu email y contraseña.' });
-        setLoading(false);
-      }
-    }, 1600);
-  };
-
-  const handleForgot = () => {
-    alert('Función de recuperación de contraseña. Se enviaría un email para restablecer la contraseña.');
-  };
-
-  const handleRegister = () => {
-    router.push('/registro');
-  };
+export default function LoginPage() {
+  const {
+    loginData,
+    remember, setRemember,
+    loading, //setLoading,
+    snack, setSnack,
+    handleChangeField,
+    handleRegister,
+    handleForgot,
+    handleSubmit
+  } = useLoginPage();
 
   return (
     <Box
@@ -198,13 +122,13 @@ export default function LoginMUI() {
                 <TextField
                   label="Correo Electrónico"
                   variant="filled"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => validateField('email', email.trim().toLowerCase())}
-                  error={!!errors.email}
-                  helperText={errors.email || ' '}
+                  value={loginData.email}
+                  onChange={(e) => handleChangeField("email", e.target.value)}
+                  // onBlur={() => validateField('email', email.trim().toLowerCase())}
+                  // error={!!errors.email}
+                  // helperText={errors.email || ' '}
                   fullWidth
-                  InputProps={{ disableUnderline: true }}
+                  // InputProps={{ disableUnderline: true }}
                   sx={{
                     borderRadius: 2,
                     '& .MuiFilledInput-root': {
@@ -225,13 +149,13 @@ export default function LoginMUI() {
                   label="Contraseña"
                   type="password"
                   variant="filled"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onBlur={() => validateField('password', password)}
-                  error={!!errors.password}
-                  helperText={errors.password || ' '}
+                  value={loginData.password}
+                  onChange={(e) => handleChangeField("password", e.target.value)}
+                  // onBlur={() => validateField('password', password)}
+                  // error={!!errors.password}
+                  // helperText={errors.password || ' '}
                   fullWidth
-                  InputProps={{ disableUnderline: true }}
+                  // InputProps={{ disableUnderline: true }}
                   sx={{
                     borderRadius: 2,
                     '& .MuiFilledInput-root': {
@@ -305,3 +229,4 @@ export default function LoginMUI() {
     </Box>
   );
 }
+

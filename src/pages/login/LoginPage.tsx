@@ -15,10 +15,10 @@ import {
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import Grid from '@mui/material/Grid';
-import { useLoginPage } from './LoginPage.hook';
+import { useLoginPage } from '@/hooks/LoginPage.hook';
 
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const {
     loginData,
     remember, setRemember,

@@ -25,21 +25,22 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import EventIcon from "@mui/icons-material/Event";
 import "jspdf-autotable";
-import { CreateUserDialog } from "./dialogs/CreateUserDialog";
-import { SearchUserDialog } from "./dialogs/SearchUserDialog";
-import { DeleteUserDialog } from "./dialogs/DeleteUserDialog";
-import { VehiclesDialog } from "./dialogs/VehiclesDialog";
-import { ScheduleAppointmentDialog } from "./dialogs/ScheduleAppointmentDialog";
-import { ReassignAppointmentDialog } from "./dialogs/ReassignAppointmentDialog";
-import { CancelAppointmentDialog } from "./dialogs/CancelAppointmentDialog";
-import { CreateServiceDialog } from "./dialogs/CreateServiceDialog";
-import { ServicesCatalogDialog } from "./dialogs/ServicesCatalogDialog";
-import { DeleteServiceDialog } from "./dialogs/DeleteServiceDialog";
-import { ProvidersDialog } from "./dialogs/ProvidersDialog";
-import { SparepartsDialog } from "./dialogs/SparepartsDialog";
-import { ReportsDialog } from "./dialogs/ReportsDialog"
-import { DangerBtn, GhostBtn, HeaderBar, ModuleCardRoot, ModuleHeader, PrimaryBtn, StatCardRoot, WelcomeSection } from "./AdminGateway.components";
-import { useAdminGateway } from "./AdminGateway.hook";
+// import "@/components/admin-gateway/dialogs/"
+import { CreateUserDialog } from "@/components/admin-gateway/dialogs/CreateUserDialog";
+import { SearchUserDialog } from "@/components/admin-gateway/dialogs/SearchUserDialog";
+import { DeleteUserDialog } from "@/components/admin-gateway/dialogs/DeleteUserDialog";
+import { VehiclesDialog } from "@/components/admin-gateway/dialogs/VehiclesDialog";
+import { ScheduleAppointmentDialog } from "@/components/admin-gateway/dialogs/ScheduleAppointmentDialog";
+import { ReassignAppointmentDialog } from "@/components/admin-gateway/dialogs/ReassignAppointmentDialog";
+import { CancelAppointmentDialog } from "@/components/admin-gateway/dialogs/CancelAppointmentDialog";
+import { CreateServiceDialog } from "@/components/admin-gateway/dialogs/CreateServiceDialog";
+import { ServicesCatalogDialog } from "@/components/admin-gateway/dialogs/ServicesCatalogDialog";
+import { DeleteServiceDialog } from "@/components/admin-gateway/dialogs/DeleteServiceDialog";
+import { ProvidersDialog } from "@/components/admin-gateway/dialogs/ProvidersDialog";
+import { SparepartsDialog } from "@/components/admin-gateway/dialogs/SparepartsDialog";
+import { ReportsDialog } from "@/components/admin-gateway/dialogs/ReportsDialog"
+import { DangerBtn, GhostBtn, HeaderBar, ModuleCardRoot, ModuleHeader, PrimaryBtn, StatCardRoot, WelcomeSection } from "@/components/admin-gateway/AdminGateway.components";
+import { useAdminGateway } from "@/hooks/AdminGateway.hook";
 
 
 // Tema base con tipografía y radio similar al mockup

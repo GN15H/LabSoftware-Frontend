@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid'; // Grid v2 (sin item/xs/md) -> usar size={{ }}
 import CheckIcon from '@mui/icons-material/Check';
-import { useRegisterPage } from './RegisterPage.hook';
+import { useRegisterPage } from '@/hooks/RegisterPage.hook';
 
 const PALETA = {
   fondo: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -32,7 +32,7 @@ const PALETA = {
   grisBorde: '#ecf0f1',
 };
 
-export const RegisterPage = () => {
+export default function RegisterPage() {
 
   const {
     snack, setSnack,
