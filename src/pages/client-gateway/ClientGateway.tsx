@@ -16,7 +16,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid"; // Grid v2
-// import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Appointments } from "./components/Appointments";
 import { Vehicles } from "./components/Vehicles";
 import { useClientGateway } from "./ClientGateway.hook";
@@ -155,9 +155,9 @@ export default function ClientGateway() {
       </Container>
 
       {/* Floating Chat Button */}
-      {/* <Box onClick={() => setChatOpen(true)} sx={{ position: "fixed", bottom: 30, right: 30, width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #3498db 0%, #2980b9 100%)", boxShadow: "0 4px 20px rgba(52, 152, 219, 0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 26, zIndex: 1000, transition: "transform .2s, box-shadow .2s", "&:hover": { transform: "scale(1.1)", boxShadow: "0 6px 25px rgba(52, 152, 219, 0.6)" } }}> */}
-      {/*   <ChatBubbleOutlineIcon /> */}
-      {/* </Box> */}
+      <Box onClick={() => window.open('https://t.me/AutoLinkManagerbot', '_blank')} sx={{ position: "fixed", bottom: 30, right: 30, width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #3498db 0%, #2980b9 100%)", boxShadow: "0 4px 20px rgba(52, 152, 219, 0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 26, zIndex: 1000, transition: "transform .2s, box-shadow .2s", "&:hover": { transform: "scale(1.1)", boxShadow: "0 6px 25px rgba(52, 152, 219, 0.6)" } }}>
+        <ChatBubbleOutlineIcon />
+      </Box>
 
       {/* Chat Modal */}
 
